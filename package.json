@@ -1,0 +1,17 @@
+{
+  "name": "wumingstore",
+  "version": "1.0.0",
+  "description": "xcx wumingstore",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "renwuming",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^0.0.3",
+    "koa": "^2.2.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.2.0"
+  }
+}
