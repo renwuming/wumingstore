@@ -3,7 +3,7 @@ const client = redis.createClient(6379, "localhost");
 
 client.print = redis.print;
 
-client.get = function(key) {
+client.getSync = function(key) {
   return new Promise(function(resolve, reject) {
     client.get(key, function(error, res) {
       if(error) {

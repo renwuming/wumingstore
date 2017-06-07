@@ -18,16 +18,20 @@ r.post("/sessionkey", async ( ctx ) => {
   }
   const res = await http.get("https://api.weixin.qq.com/sns/jscode2session", data);
 
-  const sessionid = WXBizDataCrypt.randomKey();
+  if(res.errcode) {
+    ctx.body = res;
+  } else {
+    const sessionid = WXBizDataCrypt.randomKey();
+    redis.set(sessionid, JSON.stringify(res), redis.print);
+    redis.expire(sessionid, EXPIRE_TIME); // 有效期一星期
+    ctx.body = sessionid;
+  }
 
-  redis.set(sessionid, JSON.stringify(res), redis.print);
-  redis.expire(sessionid, EXPIRE_TIME); // 有效期一星期
-  ctx.body = sessionid;
 });
 
 r.post("/decryptedData", async ( ctx ) => {
   const req = ctx.request.body;
-  const sk = await redis.get(req.sessionid);
+  const sk = await redis.getSync(req.sessionid);
   const pc = new WXBizDataCrypt(AppID, sk);
   let data;
   try {
