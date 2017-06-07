@@ -6,7 +6,7 @@ const redis = require("./lib/redis");
 
 const AppID = "wx78bc21b55d1cc0c5";
 const AppSecret = "e84cd2c585853ddbb0cb59f784f9895c";
-
+const EXPIRE_TIME = 3600*24*7;
 
 r.post("/sessionkey", async ( ctx ) => {
   const req = ctx.request.body;
@@ -18,16 +18,17 @@ r.post("/sessionkey", async ( ctx ) => {
   }
   const res = await http.get("https://api.weixin.qq.com/sns/jscode2session", data);
 
-  const sessionkey = WXBizDataCrypt.randomKey();
+  const sessionid = WXBizDataCrypt.randomKey();
 
-  redis.set(sessionkey, res, redis.print);
-
-  ctx.body = sessionkey;
+  redis.set(sessionid, JSON.stringify(res), redis.print);
+  redis.expire(sessionid, EXPIRE_TIME); // 有效期一星期
+  ctx.body = sessionid;
 });
 
 r.post("/decryptedData", async ( ctx ) => {
   const req = ctx.request.body;
-  const pc = new WXBizDataCrypt(AppID, req.sessionKey);
+  const sk = await redis.get(req.sessionid);
+  const pc = new WXBizDataCrypt(AppID, sk);
   let data;
   try {
     data = pc.decryptData(req.encryptedData, req.iv);
