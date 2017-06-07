@@ -32,4 +32,9 @@ WXBizDataCrypt.prototype.decryptData = function (encryptedData, iv) {
   return decoded
 }
 
-module.exports = WXBizDataCrypt
+WXBizDataCrypt.randomKey = function() {
+  let key = crypto.randomBytes(16).toString("hex");
+  return key;
+}
+
+module.exports = WXBizDataCrypt;

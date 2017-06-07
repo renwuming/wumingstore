@@ -1,10 +1,12 @@
 const Router = require("koa-router");
 const r = new Router();
-const http = require("./http");
+const http = require("./lib/http");
+const WXBizDataCrypt = require("./lib/WXBizDataCrypt");
+const redis = require("./lib/redis");
 
-const WXBizDataCrypt = require('./WXBizDataCrypt');
 const AppID = "wx78bc21b55d1cc0c5";
 const AppSecret = "e84cd2c585853ddbb0cb59f784f9895c";
+
 
 r.post("/sessionkey", async ( ctx ) => {
   const req = ctx.request.body;
@@ -15,7 +17,12 @@ r.post("/sessionkey", async ( ctx ) => {
     grant_type: "authorization_code"
   }
   const res = await http.get("https://api.weixin.qq.com/sns/jscode2session", data);
-  ctx.body = res;
+
+  const sessionkey = WXBizDataCrypt.randomKey();
+
+  redis.set(sessionkey, res, redis.print);
+
+  ctx.body = sessionkey;
 });
 
 r.post("/decryptedData", async ( ctx ) => {
