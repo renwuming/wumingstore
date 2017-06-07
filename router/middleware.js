@@ -5,8 +5,13 @@ mid.getSessionkey = function() {
   return async function(ctx, next) {
     const req = ctx.request.body;
     const sk = await redis.getSync(req.sessionid);
-    ctx.state.sessionkey = JSON.parse(sk).session_key;
-    next();
+    sk = JSON.parse(sk).session_key;
+    if(sk) {
+      ctx.state.sessionkey = sk;
+      next();
+    } else {
+      ctx.body = {errcode: 1001};
+    }
   }
 }
 

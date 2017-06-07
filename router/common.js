@@ -18,7 +18,6 @@ r.post("/sessionkey", async ( ctx ) => {
     grant_type: "authorization_code"
   }
   const res = await http.get("https://api.weixin.qq.com/sns/jscode2session", data);
-
   if(res.errcode) {
     ctx.body = res;
   } else {
@@ -27,7 +26,6 @@ r.post("/sessionkey", async ( ctx ) => {
     redis.expire(sessionid, EXPIRE_TIME); // 有效期一星期
     ctx.body = sessionid;
   }
-
 });
 
 r.post("/decryptedData", middleware.getSessionkey(), async ( ctx ) => {
@@ -39,9 +37,6 @@ r.post("/decryptedData", middleware.getSessionkey(), async ( ctx ) => {
   } catch(e) {
     data = e;
   }
-
-console.log('解密后 data: ', data)
-
   ctx.body = data;
 });
 
