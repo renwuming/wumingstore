@@ -3,6 +3,7 @@ const r = new Router();
 const http = require("./lib/http");
 const WXBizDataCrypt = require("./lib/WXBizDataCrypt");
 const redis = require("./lib/redis");
+const middleware = require("./middleware");
 
 const AppID = "wx78bc21b55d1cc0c5";
 const AppSecret = "e84cd2c585853ddbb0cb59f784f9895c";
@@ -29,10 +30,9 @@ r.post("/sessionkey", async ( ctx ) => {
 
 });
 
-r.post("/decryptedData", async ( ctx ) => {
+r.post("/decryptedData", middleware.getSessionkey(), async ( ctx ) => {
   const req = ctx.request.body;
-  const sk = await redis.getSync(req.sessionid);
-  const pc = new WXBizDataCrypt(AppID, sk);
+  const pc = new WXBizDataCrypt(AppID, ctx.state.sessionkey);
   let data;
   try {
     data = pc.decryptData(req.encryptedData, req.iv);
