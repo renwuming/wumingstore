@@ -5,7 +5,7 @@ mid.getSessionkey = function() {
   return async function(ctx, next) {
     const req = ctx.request.body;
     const sk = await redis.getSync(req.sessionid);
-    sk = sk && JSON.parse(sk).session_key;
+    sk && (sk = JSON.parse(sk).session_key);
     if(sk) {
       ctx.state.sessionkey = sk;
       next();
