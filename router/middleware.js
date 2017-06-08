@@ -1,16 +1,17 @@
 const redis = require("./lib/redis");
 const mid = {};
 
-mid.getSessionkey = function() {
+mid.getSession = function() {
   return async function(ctx, next) {
     const req = ctx.request.body;
     let sk = await redis.getSync(req.sessionid);
-    sk && (sk = JSON.parse(sk).session_key);
     if(sk) {
-      ctx.state.sessionkey = sk;
+      sk = JSON.parse(sk);
+      ctx.state.sessionkey = sk.sessionkey;
+      ctx.state.openid = sk.openid;
       next();
     } else {
-      ctx.body = {errcode: 1001};
+      ctx.body = {errcode: 6666};
     }
   }
 }
