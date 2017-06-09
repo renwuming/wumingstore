@@ -25,9 +25,9 @@ async function getDB() {
   }
 }
 
-const saveSync = function(collection, data) {
+const updateSync = function(collection, criteria, objNew) {
   return new Promise(function(resolve, reject) {
-    collection.save(data, function(err, res) {
+    collection.update(criteria, objNew, {upsert: true, multi: true}, function(err, res) {
       if(err) {
         reject(err);
       } else {
@@ -49,10 +49,10 @@ const findSync = function(collection, query) {
   });
 }
 
-async function save(collection, data, callback) {
+async function update(collection, criteria, objNew, callback) {
   const db = await getDB();
   const col = db.collection(collection);
-  let res = await saveSync(col, data);
+  let res = await updateSync(col, criteria, objNew);
   return res;
 }
 
@@ -64,6 +64,6 @@ async function find(collection, query) {
 }
 
 module.exports = {
-  save,
+  update,
   find
 }
