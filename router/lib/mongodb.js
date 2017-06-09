@@ -25,14 +25,15 @@ async function getDB() {
   }
 }
 
-async function save(collection, data, callback) {
-  let db = await getDB();
-  db.collection(collection).save(data, function(err, res) {
-    if(err) {
-      console.log(err);
-    } else {
-      callback(res);
-    }
+const saveSync = function(collection, data) {
+  return new Promise(function(resolve, reject) {
+    collection.save(data, function(err, res) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
   });
 }
 
@@ -48,10 +49,17 @@ const findSync = function(collection, query) {
   });
 }
 
-async function find(collection, query, callback) {
+async function save(collection, data, callback) {
   const db = await getDB();
   const col = db.collection(collection);
-  const res = await findSync(col, query);
+  let res = await saveSync(col, data);
+  return res;
+}
+
+async function find(collection, query) {
+  const db = await getDB();
+  const col = db.collection(collection);
+  let res = await findSync(col, query);
   return res;
 }
 

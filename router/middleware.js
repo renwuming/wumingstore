@@ -9,7 +9,7 @@ mid.getSession = function() {
       sk = JSON.parse(sk);
       ctx.state.sessionkey = sk.sessionkey;
       ctx.state.openid = sk.openid;
-      next();
+      await next();
     } else {
       ctx.body = {errcode: 6666};
     }
