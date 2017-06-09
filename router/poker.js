@@ -18,7 +18,6 @@ r.post("/best", middleware.getSession(), async ( ctx ) => {
   const query = {
     _id: ctx.state.openid
   };
-  let best;
   let res = await mongodb.find("poker", query);
   ctx.body = res[0].data;
 });
