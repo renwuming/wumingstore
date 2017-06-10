@@ -32,7 +32,7 @@ r.post("/data", middleware.getSession(), async ( ctx ) => {
     delete res._id;
     ctx.body = res;
   } else {
-    ctx.body = {};
+    ctx.body = { count:-1 };
   }
 });
 

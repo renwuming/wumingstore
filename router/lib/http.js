@@ -11,10 +11,10 @@ http.get = function(url, params, headers) {
       json: true
     };
     request(options).then(function(res) {
-      console.log("http get [%s] : %s", JSON.stringify(options), res ? "OK" : JSON.stringify(res));
+      console.log("\n%s - http get [%s] : %s", new Date(), JSON.stringify(options), res ? "OK" : JSON.stringify(res));
       resolve(res);
     }).catch(function(e) {
-      console.error("http get [%s] fail", JSON.stringify(options), e.statusCode);
+      console.error("\n%s - http get [%s] fail", new Date(), JSON.stringify(options), e.statusCode);
       reject(e);
     });
   });
