@@ -14,8 +14,7 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
   const query = {
     _id: openGId
   };
-  let res = await mongodb.find(COLLECTION, query);
-  res = res[0];
+  let res = (await mongodb.find(COLLECTION, query))[0];
   if(res) {
     ctx.body = res.gamedata;
   } else {
@@ -41,7 +40,7 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
   if(res.errmsg) {
     ctx.body = res;
   } else {
-    res = await mongodb.find(COLLECTION, query);
+    res = (await mongodb.find(COLLECTION, query))[0];
     ctx.body = res.gamedata;
   }
 });
