@@ -7,7 +7,7 @@ mid.getSession = function() {
     let sk = await redis.getSync(req.sessionid);
     if(sk) {
       sk = JSON.parse(sk);
-      ctx.state.sessionkey = sk.sessionkey;
+      ctx.state.sessionkey = sk.session_key;
       ctx.state.openid = sk.openid;
       await next();
     } else {
