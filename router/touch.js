@@ -42,7 +42,7 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
     ctx.body = res;
   } else {
     res = await mongodb.find(COLLECTION, query);
-    ctx.body = { res.gamedata };
+    ctx.body = res.gamedata;
   }
 });
 
