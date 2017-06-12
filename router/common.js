@@ -23,7 +23,7 @@ r.post("/sessionkey", async ( ctx ) => {
     ctx.body = res;
   } else {
     const sessionid = WXBizDataCrypt.randomKey();
-    redis.setSync(sessionid, req);
+    redis.setSync(sessionid, res);
     ctx.body = sessionid;
   }
 });
