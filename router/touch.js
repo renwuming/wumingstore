@@ -23,11 +23,24 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
       openidlist: [ctx.state.openid],
       gamedata: INIT_GAME_DATA
     };
-    res = await mongodb.update(COLLECTION, {
-      _id: openGId,
-    }, {
+    res = await mongodb.update(COLLECTION, query, {
       $set: updata
     });
+    ctx.body = { INIT_GAME_DATA };
+  }
+});
+
+r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
+  const openGId = ctx.state.decryptedData.openGId;
+  const query = {
+    _id: openGId
+  };
+  res = await mongodb.update(COLLECTION, query, {
+    $inc: {"gamedata.countdown": -1}
+  });
+  if(res.errmsg) {
+    ctx.body = res;
+  } else {
     ctx.body = {};
   }
 });

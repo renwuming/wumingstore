@@ -13,7 +13,7 @@ mid.getSession = function() {
       ctx.state.openid = sk.openid;
       await next();
     } else {
-      ctx.body = {errcode: 6666};
+      ctx.body = {errMsg: "sessionkey not found"};
     }
   }
 }
@@ -29,8 +29,10 @@ mid.decryptedData = function() {
         ctx.body = e;
         return;
       }
+      await next();
+    } else {
+      ctx.body = {errMsg: "encryptedData not found"};
     }
-    await next();
   }
 }
 

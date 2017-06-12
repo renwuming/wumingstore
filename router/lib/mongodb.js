@@ -52,8 +52,12 @@ const findSync = function(collection, query) {
 async function update(collection, criteria, objNew, callback) {
   const db = await getDB();
   const col = db.collection(collection);
-  let res = await updateSync(col, criteria, objNew);
-  return res;
+  try {
+    let res = await updateSync(col, criteria, objNew);
+    return res;
+  } catch(e) {
+    return e;
+  }
 }
 
 async function find(collection, query) {
