@@ -37,6 +37,7 @@ r.post("/decryptedData", middleware.getSession(), async ( ctx ) => {
   try {
     data = pc.decryptData(req.encryptedData, req.iv);
   } catch(e) {
+console.log(e);
     data = e;
   }
   ctx.body = data;
