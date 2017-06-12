@@ -30,12 +30,13 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
 });
 
 r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
+  const req = ctx.request.body;
   const openGId = ctx.state.decryptedData.openGId;
   const query = {
     _id: openGId
   };
   let res = await mongodb.update(COLLECTION, query, {
-    $inc: {"gamedata.countdown": -1}
+    $inc: {"gamedata.countdown": req.count}
   });
   if(res.errmsg) {
     ctx.body = res;
