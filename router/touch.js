@@ -35,13 +35,14 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
   const query = {
     _id: openGId
   };
-  res = await mongodb.update(COLLECTION, query, {
+  let res = await mongodb.update(COLLECTION, query, {
     $inc: {"gamedata.countdown": -1}
   });
   if(res.errmsg) {
     ctx.body = res;
   } else {
-    ctx.body = {};
+    res = await mongodb.find(COLLECTION, query);
+    ctx.body = { res.gamedata };
   }
 });
 
