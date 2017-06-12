@@ -9,7 +9,6 @@ const middleware = require("./middleware");
 
 const AppID = "wx78bc21b55d1cc0c5";
 const AppSecret = "e84cd2c585853ddbb0cb59f784f9895c";
-const EXPIRE_TIME = 3600*24*7;
 
 r.post("/sessionkey", async ( ctx ) => {
   const req = ctx.request.body;
@@ -24,8 +23,7 @@ r.post("/sessionkey", async ( ctx ) => {
     ctx.body = res;
   } else {
     const sessionid = WXBizDataCrypt.randomKey();
-    redis.set(sessionid, JSON.stringify(res), redis.print);
-    redis.expire(sessionid, EXPIRE_TIME); // 有效期一星期
+    redis.setSync(sessionid, req);
     ctx.body = sessionid;
   }
 });
