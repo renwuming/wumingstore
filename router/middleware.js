@@ -26,7 +26,7 @@ mid.decryptedData = function() {
       try {
         ctx.state.decryptedData = pc.decryptData(req.encryptedData, req.iv);
       } catch(e) {
-        ctx.body = e;
+        ctx.body = {errMsg: e.toString()};
         return;
       }
       await next();

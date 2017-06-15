@@ -31,19 +31,33 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
 
 r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
   const req = ctx.request.body;
+  const count = req.count;
   const openGId = ctx.state.decryptedData.openGId;
+  const openid = ctx.state.openid;
   const query = {
     _id: openGId
   };
+  let name;
+  if(count<0) name = "gamedata.downtable."+openid;
+  else name = "gamedata.uptable."+openid;
   let res = await mongodb.update(COLLECTION, query, {
-    $inc: {"gamedata.countdown": req.count}
+    $inc: {"gamedata.countdown": count, [name]: 1}
   });
   if(res.errmsg) {
     ctx.body = res;
   } else {
     res = (await mongodb.find(COLLECTION, query))[0];
-    ctx.body = res.gamedata;
+    ctx.body = gamedataHandle(res.gamedata, openid);
   }
 });
+
+function gamedataHandle(data, openid) {
+  console.log(data.downtable, data.downtable[openid])
+  let res = {};
+  res.countdown = data.countdown;
+  res.downSum = data.downtable[openid];
+  res.upSum = data.uptable[openid];
+  return res;
+}
 
 module.exports = r;

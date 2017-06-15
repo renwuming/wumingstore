@@ -56,7 +56,7 @@ async function update(collection, criteria, objNew, callback) {
     let res = await updateSync(col, criteria, objNew);
     return res;
   } catch(e) {
-    return e;
+    return e.toString();
   }
 }
 
