@@ -16,7 +16,7 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
   };
   let res = (await mongodb.find(COLLECTION, query))[0];
   if(res) {
-    ctx.body = res.gamedata;
+    ctx.body = await gamedataHandle(res.gamedata, ctx.state.openid);
   } else {
     const updata = {
       gamedata: INIT_GAME_DATA
