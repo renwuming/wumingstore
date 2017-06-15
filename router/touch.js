@@ -19,7 +19,6 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
     ctx.body = res.gamedata;
   } else {
     const updata = {
-      openidlist: [ctx.state.openid],
       gamedata: INIT_GAME_DATA
     };
     res = await mongodb.update(COLLECTION, query, {
@@ -38,8 +37,8 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
     _id: openGId
   };
   let name;
-  if(count<0) name = "gamedata.downtable."+openid;
-  else name = "gamedata.uptable."+openid;
+  if(count>0) name = "gamedata.op_table."+openid+".up";
+  else name = "gamedata.op_table."+openid+".down";
   let res = await mongodb.update(COLLECTION, query, {
     $inc: {"gamedata.countdown": count, [name]: 1}
   });
@@ -47,15 +46,31 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
     ctx.body = res;
   } else {
     res = (await mongodb.find(COLLECTION, query))[0];
-    ctx.body = gamedataHandle(res.gamedata, openid);
+    ctx.body = await gamedataHandle(res.gamedata, openid);
   }
 });
 
-function gamedataHandle(data, openid) {
-  let res = {};
-  res.countdown = data.countdown;
-  res.downSum = data.downtable ? data.downtable[openid] : 0;
-  res.upSum = data.uptable ? data.uptable[openid] : 0;
+async function gamedataHandle(data, openid) {
+  let res = {
+    countdown: data.countdown,
+    downSum: 0,
+    upSum: 0,
+    playerList: []
+  };
+  if(data.op_table) {
+    let dt = data.op_table;
+    res.downSum = dt[openid]&&dt[openid].down ? dt[openid].down : 0;
+    res.upSum = dt[openid]&&dt[openid].up ? dt[openid].up : 0;
+    for(key in dt) {
+      let info = (await mongodb.find("user", {_id:key}))[0].userInfo;
+      res.playerList.push({
+        info: info,
+        downSum: dt[key].down,
+        upSum: dt[key].up
+      });
+    }
+  }
+
   return res;
 }
 
