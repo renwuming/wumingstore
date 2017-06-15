@@ -52,11 +52,10 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
 });
 
 function gamedataHandle(data, openid) {
-  console.log(data.downtable, data.downtable[openid])
   let res = {};
   res.countdown = data.countdown;
-  res.downSum = data.downtable[openid];
-  res.upSum = data.uptable[openid];
+  res.downSum = data.downtable ? data.downtable[openid] : 0;
+  res.upSum = data.uptable ? data.uptable[openid] : 0;
   return res;
 }
 
