@@ -5,7 +5,7 @@ const middleware = require("./middleware");
 
 const COLLECTION = "touch";
 
-const GAMETIMELIST = [20,20,20,20,20,20,20,20,20,20,20];
+const GAMETIMELIST = [1,1,1,1,1];
 let LOCK = false;
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
