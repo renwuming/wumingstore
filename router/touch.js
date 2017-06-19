@@ -45,7 +45,7 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
   let name, player_updata = {}, data = (await mongodb.find(COLLECTION, query))[0].gamedata;
   if(count>0) name = "gamedata.op_table."+openid+".up";
   else name = "gamedata.op_table."+openid+".down";
-  if(openid != data.boss) player_updata = {["gamedata.player_table."+openid]:1};
+  if(!(data.boss_table[openid]||data.player_table[openid])) player_updata = {["gamedata.player_table."+openid]:1};
   let res = await mongodb.update(COLLECTION, query, {
     $inc: {"gamedata.countdown": count, [name]: 1},
     $set: player_updata
