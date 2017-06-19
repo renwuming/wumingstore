@@ -5,7 +5,7 @@ const middleware = require("./middleware");
 
 const COLLECTION = "touch";
 
-const GAMETIMELIST = [1,1,1,1,1];
+const GAMETIMELIST = [60,100,200,500,1000];
 let LOCK = false;
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
@@ -73,7 +73,7 @@ async function checkState(resdata) {
       };
       const newlevel = ++data.level;
       setBossAndPlayer(data); // change Boss & level
-      data.countdown = GAMETIMELIST[data.level] || 1; // change countdown time
+      data.countdown = GAMETIMELIST[data.level] || 1000; // change countdown time
       let res = await mongodb.update(COLLECTION, query, {
         $set: {gamedata: data}
       });
