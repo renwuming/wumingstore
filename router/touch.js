@@ -62,8 +62,11 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
 
 async function checkState(resdata) {
   const _id = resdata._id, data = resdata.gamedata;
-  while(LOCK) {
-    if(data.countdown <= 0 && !LOCK) {
+  if(LOCK) {
+    while(LOCK);
+    return true;
+  } else {
+    if(data.countdown <= 0) {
       LOCK = true;
       const query = {
         _id
@@ -74,10 +77,11 @@ async function checkState(resdata) {
       let res = await mongodb.update(COLLECTION, query, {
         $set: {gamedata: data}
       });
+      LOCK = false;
       return true;
     }
+    return false;
   }
-  return false;
 }
 
 function setBossAndPlayer(data) {
