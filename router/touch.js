@@ -5,7 +5,7 @@ const middleware = require("./middleware");
 
 const COLLECTION = "touch";
 
-const GAMETIMELIST = [300];
+const GAMETIMELIST = [1,1,1,1,1,1,1,1,1,1,1];
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
   const openGId = ctx.state.decryptedData.openGId;
@@ -41,19 +41,55 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
   const query = {
     _id: openGId
   };
-  let name;
+  let name, player_updata = {}, data = (await mongodb.find(COLLECTION, query))[0].gamedata;
   if(count>0) name = "gamedata.op_table."+openid+".up";
   else name = "gamedata.op_table."+openid+".down";
+  if(openid != data.boss) player_updata = {["gamedata.player_table."+openid]:1};
   let res = await mongodb.update(COLLECTION, query, {
-    $inc: {"gamedata.countdown": count, [name]: 1}
+    $inc: {"gamedata.countdown": count, [name]: 1},
+    $set: player_updata
   });
   if(res.errmsg) {
     ctx.body = res;
   } else {
     res = (await mongodb.find(COLLECTION, query))[0];
+    let levelup = await checkState(res);
+    if(levelup) res = (await mongodb.find(COLLECTION, query))[0];
     ctx.body = await gamedataHandle(res.gamedata, openid);
   }
 });
+
+async function checkState(resdata) {
+  const _id = resdata._id, data = resdata.gamedata;
+  if(data.countdown <= 0) {
+    const query = {
+      _id
+    };
+    const newlevel = ++data.level;
+    setBossAndPlayer(data); // change Boss & level
+    data.countdown = GAMETIMELIST[data.level] || 1; // change countdown time
+    let res = await mongodb.update(COLLECTION, query, {
+      $set: {gamedata: data}
+    });
+    return true;
+  }
+  return false;
+}
+
+function setBossAndPlayer(data) {
+  let keylist = Reflect.ownKeys(data.player_table), L = keylist.length;
+  if(L <= 0) {
+    data.player_table = data.boss_table;
+    data.boss_table = {};
+    setBossAndPlayer(data);
+  } else {
+    const r = Math.floor(Math.random()*L);
+    const k = keylist[r];
+    data.boss_table[k] = 1;
+    delete data.player_table[k];
+    data.boss = k;
+  }
+}
 
 async function gamedataHandle(data, openid) {
   let res = {
@@ -61,6 +97,7 @@ async function gamedataHandle(data, openid) {
     downSum: 0,
     upSum: 0,
     playerList: [],
+    level: data.level,
     bossInfo: (await mongodb.find("user", {_id: data.boss}))[0].userInfo
   };
   if(data.op_table) {
@@ -76,7 +113,6 @@ async function gamedataHandle(data, openid) {
       });
     }
   }
-
   return res;
 }
 
