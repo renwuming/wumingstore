@@ -5,26 +5,31 @@ const middleware = require("./middleware");
 
 const COLLECTION = "touch";
 
-const INIT_GAME_DATA = {
-  countdown: 60
-};
+const GAMETIMELIST = [300];
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
   const openGId = ctx.state.decryptedData.openGId;
+  const openid = ctx.state.openid;
   const query = {
     _id: openGId
   };
   let res = (await mongodb.find(COLLECTION, query))[0];
   if(res) {
-    ctx.body = await gamedataHandle(res.gamedata, ctx.state.openid);
+    ctx.body = await gamedataHandle(res.gamedata, openid);
   } else {
     const updata = {
-      gamedata: INIT_GAME_DATA
+      gamedata: {
+        countdown: GAMETIMELIST[0],
+        level: 0,
+        boss: openid,
+        boss_table: {[openid]: 1},
+        player_table: {}
+      }
     };
     res = await mongodb.update(COLLECTION, query, {
       $set: updata
     });
-    ctx.body = { INIT_GAME_DATA };
+    ctx.body = await gamedataHandle(updata.gamedata, openid);
   }
 });
 
@@ -55,7 +60,8 @@ async function gamedataHandle(data, openid) {
     countdown: data.countdown,
     downSum: 0,
     upSum: 0,
-    playerList: []
+    playerList: [],
+    bossInfo: (await mongodb.find("user", {_id: data.boss}))[0].userInfo
   };
   if(data.op_table) {
     let dt = data.op_table;
