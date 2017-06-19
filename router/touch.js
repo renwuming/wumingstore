@@ -63,7 +63,7 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
 async function checkState(resdata) {
   const _id = resdata._id, data = resdata.gamedata;
   if(LOCK) {
-    while(LOCK);
+    await sleep(500);
     return true;
   } else {
     if(data.countdown <= 0) {
@@ -82,6 +82,14 @@ async function checkState(resdata) {
     }
     return false;
   }
+}
+
+let sleep = function(delay) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(() => {
+      resolve();
+    }, delay);
+  });
 }
 
 function setBossAndPlayer(data) {
