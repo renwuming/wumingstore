@@ -24,7 +24,8 @@ r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ct
         level: 0,
         boss: openid,
         boss_table: {[openid]: 1},
-        player_table: {}
+        player_table: {},
+        score: 0
       }
     };
     res = await mongodb.update(COLLECTION, query, {
@@ -71,6 +72,7 @@ async function checkState(resdata) {
       const query = {
         _id
       };
+      data.score += GAMETIMELIST[data.level] || 1000;
       const newlevel = ++data.level;
       setBossAndPlayer(data); // change Boss & level
       data.countdown = GAMETIMELIST[data.level] || 1000; // change countdown time
@@ -114,7 +116,8 @@ async function gamedataHandle(data, openid) {
     upSum: 0,
     playerList: [],
     level: data.level,
-    bossInfo: (await mongodb.find("user", {_id: data.boss}))[0].userInfo
+    bossInfo: (await mongodb.find("user", {_id: data.boss}))[0].userInfo,
+    score: data.score
   };
   if(data.op_table) {
     let dt = data.op_table;
