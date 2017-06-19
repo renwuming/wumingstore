@@ -6,6 +6,7 @@ const middleware = require("./middleware");
 const COLLECTION = "touch";
 
 const GAMETIMELIST = [20,20,20,20,20,20,20,20,20,20,20];
+const LOCK = false;
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
   const openGId = ctx.state.decryptedData.openGId;
@@ -61,17 +62,20 @@ r.post("/countdown", middleware.getSession(), middleware.decryptedData(), async 
 
 async function checkState(resdata) {
   const _id = resdata._id, data = resdata.gamedata;
-  if(data.countdown <= 0) {
-    const query = {
-      _id
-    };
-    const newlevel = ++data.level;
-    setBossAndPlayer(data); // change Boss & level
-    data.countdown = GAMETIMELIST[data.level] || 1; // change countdown time
-    let res = await mongodb.update(COLLECTION, query, {
-      $set: {gamedata: data}
-    });
-    return true;
+  while(LOCK) {
+    if(data.countdown <= 0 && !LOCK) {
+      LOCK = true;
+      const query = {
+        _id
+      };
+      const newlevel = ++data.level;
+      setBossAndPlayer(data); // change Boss & level
+      data.countdown = GAMETIMELIST[data.level] || 1; // change countdown time
+      let res = await mongodb.update(COLLECTION, query, {
+        $set: {gamedata: data}
+      });
+      return true;
+    }
   }
   return false;
 }
