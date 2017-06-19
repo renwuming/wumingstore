@@ -6,7 +6,7 @@ const middleware = require("./middleware");
 const COLLECTION = "touch";
 
 const GAMETIMELIST = [20,20,20,20,20,20,20,20,20,20,20];
-const LOCK = false;
+let LOCK = false;
 
 r.post("/start", middleware.getSession(), middleware.decryptedData(), async ( ctx ) => {
   const openGId = ctx.state.decryptedData.openGId;
