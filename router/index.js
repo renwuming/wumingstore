@@ -5,6 +5,7 @@ const common = require("./common");
 const user = require("./user");
 const poker = require("./poker");
 const touch = require("./touch");
+const test = require("./test");
 
 const r = function(app) {
 
@@ -12,6 +13,7 @@ const r = function(app) {
   router.use("/user", user.routes(), user.allowedMethods());
   router.use("/poker", poker.routes(), poker.allowedMethods());
   router.use("/touch", touch.routes(), touch.allowedMethods());
+  router.use("/test", test.routes(), test.allowedMethods());
 
   app.use(router.routes()).use(router.allowedMethods());
 }
