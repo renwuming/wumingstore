@@ -24,7 +24,7 @@ r.post("/list", middleware.getSession(), async ( ctx ) => {
   ctx.body = {};
 });
 
-r.get("/list", middleware.getSession(), async ( ctx ) => {
+r.post("/getlist", middleware.getSession(), async ( ctx ) => {
   const query = {
       _id: ctx.state.openid
     };
