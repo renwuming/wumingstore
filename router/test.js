@@ -5,7 +5,7 @@ const middleware = require("./middleware");
 
 const COLLECTION = "test";
 
-r.post("/item", middleware.getSession(), async ( ctx ) => {
+r.post("/list", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
   const query = {
       _id: ctx.state.openid
@@ -22,6 +22,18 @@ r.post("/item", middleware.getSession(), async ( ctx ) => {
     }
   });
   ctx.body = {};
+});
+
+r.get("/list", middleware.getSession(), async ( ctx ) => {
+  const query = {
+      _id: ctx.state.openid
+    };
+  let list = (await mongodb.find(COLLECTION, query))[0];
+  list = list ? list.testlist : [];
+
+  ctx.body = {
+    testlist: list
+  };
 });
 
 module.exports = r;
