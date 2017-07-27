@@ -31,12 +31,23 @@ r.post("/list", middleware.getSession(), async ( ctx ) => {
 
 r.post("/getlist", middleware.getSession(), async ( ctx ) => {
   const query = {
-      _id: ctx.state.openid
-    };
+    _id: ctx.state.openid
+  };
   let list = (await mongodb.find(COLLECTION, query))[0];
   list = list ? list.testlist : {};
 
   ctx.body = list;
+});
+
+r.post("/getitem", middleware.getSession(), async ( ctx ) => {
+  const key = ctx.request.body.key;
+  const query = {
+    _id: ctx.state.openid
+  };
+  let list = (await mongodb.find(COLLECTION, query))[0];
+  list = list ? list.testlist : {};
+
+  ctx.body = list[key];
 });
 
 module.exports = r;
