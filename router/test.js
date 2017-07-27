@@ -58,7 +58,11 @@ r.post("/commit", middleware.getSession(), async ( ctx ) => {
     _id: ctx.state.openid
   };
   let list = (await mongodb.find(COLLECTION, query))[0];
-  list = list ? list.answerlist : {};
+  if(list && list.answerlist) {
+    list = list.answerlist;
+  } else {
+    list = {};
+  }
   if(list[req.key]) {
     list[req.key].push(data);
   } else {
