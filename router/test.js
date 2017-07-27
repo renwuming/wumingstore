@@ -51,7 +51,7 @@ r.post("/getitem", middleware.getSession(), async ( ctx ) => {
 r.post("/commit", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
   const data = {
-    player: req.player,
+    player: middleware.getSessionBy(req.player),
     data: req.data
   };
   const query = {
@@ -68,7 +68,6 @@ r.post("/commit", middleware.getSession(), async ( ctx ) => {
   } else {
     list[req.key] = [data];
   }
-
   let res = await mongodb.update(COLLECTION, query, {
     $set: {
       answerlist: list
@@ -77,5 +76,31 @@ r.post("/commit", middleware.getSession(), async ( ctx ) => {
 
   ctx.body = {};
 });
+
+r.post("/getreslist", middleware.getSession(), async ( ctx ) => {
+  const req = ctx.request.body;
+  const query = {
+    _id: ctx.state.openid
+  };
+  let list = (await mongodb.find(COLLECTION, query))[0];
+  if(list && list.answerlist) {
+    list = list.answerlist;
+    await handleData(list);
+  } else {
+    list = {};
+  }
+  
+  ctx.body = list;
+});
+
+async function handleData(data) {
+  for(let key in data) {
+    data[key].forEach(e => {
+      let k = e.player;
+      let info = (await mongodb.find("user", {_id:k}))[0].userInfo;
+      e.player = info;
+    });
+  }
+}
 
 module.exports = r;

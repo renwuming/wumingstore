@@ -18,6 +18,11 @@ mid.getSession = function() {
   }
 }
 
+mid.getSessionBy = async function(sessionid) {
+    let sk = await redis.getSync(req.sessionid);
+    return sk.openid;
+}
+
 mid.decryptedData = function() {
   return async function(ctx, next) {
     const req = ctx.request.body;
