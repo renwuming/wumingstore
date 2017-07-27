@@ -51,9 +51,9 @@ r.post("/getitem", middleware.getSession(), async ( ctx ) => {
 r.post("/commit", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
   const data = {
+    player: await middleware.getSessionBy(req.player),
     data: req.data
   };
-  data.player = await middleware.getSessionBy(req.player);
   const query = {
     _id: ctx.state.openid
   };
