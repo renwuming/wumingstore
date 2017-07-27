@@ -95,11 +95,11 @@ r.post("/getreslist", middleware.getSession(), async ( ctx ) => {
 
 async function handleData(data) {
   for(let key in data) {
-    data[key].forEach(e => {
-      let k = e.player;
+    for(let v of data[key]) {
+      let k = v.player;
       let info = (await mongodb.find("user", {_id:k}))[0].userInfo;
       e.player = info;
-    });
+    }
   }
 }
 
