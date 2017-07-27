@@ -19,9 +19,7 @@ r.post("/list", middleware.getSession(), async ( ctx ) => {
   list = list ? list.testlist : {};
   list[hash] = req.item;
 
-  let res = await mongodb.update(COLLECTION, {
-    _id: ctx.state.openid,
-  }, {
+  let res = await mongodb.update(COLLECTION, query, {
     $set: {
       testlist: list
     }
@@ -48,6 +46,32 @@ r.post("/getitem", middleware.getSession(), async ( ctx ) => {
   list = list ? list.testlist : {};
 
   ctx.body = list[key];
+});
+
+r.post("/commit", middleware.getSession(), async ( ctx ) => {
+  const req = ctx.request.body;
+  const data = {
+    player: req.player,
+    data: req.data
+  };
+  const query = {
+    _id: ctx.state.openid
+  };
+  let list = (await mongodb.find(COLLECTION, query))[0];
+  list = list ? list.answerlist : {};
+  if(list[req.key]) {
+    list[req.key].push(data);
+  } else {
+    list[req.key] = [data];
+  }
+
+  let res = await mongodb.update(COLLECTION, query, {
+    $set: {
+      answerlist: list
+    }
+  });
+
+  ctx.body = {};
 });
 
 module.exports = r;
