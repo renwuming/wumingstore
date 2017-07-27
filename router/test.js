@@ -36,9 +36,7 @@ r.post("/getlist", middleware.getSession(), async ( ctx ) => {
   let list = (await mongodb.find(COLLECTION, query))[0];
   list = list ? list.testlist : {};
 
-  ctx.body = {
-    testlist: list
-  };
+  ctx.body = list;
 });
 
 module.exports = r;
