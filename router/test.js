@@ -13,7 +13,7 @@ r.post("/list", middleware.getSession(), async ( ctx ) => {
   };
   let shaObj = new jsSHA("SHA-512", "TEXT");
   shaObj.update(req.item);
-  const hash = shaObj.getHash("HEX");
+  const hash = shaObj.getHash("HEX").substr(0,16);
 
   let list = (await mongodb.find(COLLECTION, query))[0];
   list = list ? list.testlist : {};
