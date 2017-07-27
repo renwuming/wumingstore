@@ -97,8 +97,9 @@ async function handleData(data) {
   for(let key in data) {
     for(let v of data[key]) {
       let k = v.player;
-      let info = (await mongodb.find("user", {_id:k}))[0].userInfo;
-      e.player = info;
+      let info = (await mongodb.find("user", {_id:k}))[0];
+      info && (info = info.userInfo);
+      v.player = info;
     }
   }
 }
