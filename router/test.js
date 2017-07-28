@@ -50,6 +50,7 @@ r.post("/getitem", middleware.getSession(), async ( ctx ) => {
 
 r.post("/commit", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
+console.log(req); //
   const data = {
     player: await middleware.getSessionBy(req.player),
     data: req.data
