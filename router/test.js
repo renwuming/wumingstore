@@ -108,17 +108,24 @@ async function handleData(data) {
   }
 }
 
-
+const PAPERS_LENGTH = 5;
 r.get("/papers/:lastkey", async ( ctx ) => {
-  const _lastkey = +ctx.params.lastkey;
+  let _lastkey = +ctx.params.lastkey,
+            has_more;
   const query = {
     "data.post.publish_time": {
       $gt: _lastkey
     }
   };
   let list = (await mongodb.find(COLLECTION_PAPERS, query));
+  has_more = list.length > PAPERS_LENGTH;
+  list = list.slice(0,PAPERS_LENGTH);
   await handlePaperGet(list);
-  ctx.body = list;
+  ctx.body = {
+    has_more,
+    last_key: _lastkey,
+    feeds: list
+  };
 });
 
 async function handlePaperGet(list) {
