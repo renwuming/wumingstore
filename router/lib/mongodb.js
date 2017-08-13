@@ -37,15 +37,25 @@ const updateSync = function(collection, criteria, objNew) {
   });
 }
 
-const findSync = function(collection, query) {
+const findSync = function(collection, query, one) {
   return new Promise(function(resolve, reject) {
-    collection.find(query).toArray(function(err, res) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
+    if(one) {
+      collection.findOne(query, function(err, res) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    } else {
+      collection.find(query).toArray(function(err, res) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    }
   });
 }
 
@@ -67,7 +77,15 @@ async function find(collection, query) {
   return res;
 }
 
+async function findOne(collection, query) {
+  const db = await getDB();
+  const col = db.collection(collection);
+  let res = await findSync(col, query, true);
+  return res;
+}
+
 module.exports = {
   update,
-  find
+  find,
+  findOne
 }

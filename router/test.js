@@ -1,20 +1,23 @@
 const Router = require("koa-router");
 const r = new Router();
+const fs = require("fs");
+const path = require("path");
 const mongodb = require("./lib/mongodb");
 const middleware = require("./middleware");
-const jsSHA = require("jssha");
+const Hash = require("./lib/hash.js");
+const utils = require("./lib/utils.js");
 
 const COLLECTION = "test";
+const COLLECTION_PAPERS = "papers";
+const COLLECTION_Q = "questions";
 
 r.post("/list", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
   const query = {
     _id: ctx.state.openid
   };
-  let shaObj = new jsSHA("SHA-512", "TEXT");
-  shaObj.update(req.item);
-  const hash = shaObj.getHash("HEX").substr(0,16);
-
+  
+  const hash = Hash(req.item);
   let list = (await mongodb.find(COLLECTION, query))[0];
   list = list ? list.testlist : {};
   list[hash] = req.item;
@@ -50,7 +53,7 @@ r.post("/getitem", middleware.getSession(), async ( ctx ) => {
 
 r.post("/commit", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
-console.log(req); //
+
   const data = {
     player: await middleware.getSessionBy(req.player),
     data: req.data
@@ -104,5 +107,74 @@ async function handleData(data) {
     }
   }
 }
+
+
+r.get("/papers/:lastkey", async ( ctx ) => {
+  const _lastkey = +ctx.params.lastkey;
+  const query = {
+    "data.post.publish_time": {
+      $gt: _lastkey
+    }
+  };
+  let list = (await mongodb.find(COLLECTION_PAPERS, query));
+  await handlePaperGet(list);
+  ctx.body = list;
+});
+
+async function handlePaperGet(list) {
+  for(let i = list.length-1; i >=0; i--) {
+    let item = list[i],
+         _ql = item.data.post.questions;
+    for(let j = _ql.length-1; j >=0; j--) {
+      let _id = _ql[j],
+           q = { _id };
+      // let res = (await mongodb.find(COLLECTION_Q, q))[0];
+      let res = await mongodb.findOne(COLLECTION_Q, q);
+      _ql[j] = res;
+    }
+  };
+}
+
+
+// 从json文件更新题库
+const FILE_PATH = path.join(__dirname, "../static/papers.json");
+r.post("/papers", async ( ctx ) => {
+  const _papers = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8'));
+  for(let i = _papers.length-1; i >=0; i--) {
+    let item = await handlePaper(_papers[i]),
+         q = { _id: item.post._id };
+    let res = await mongodb.update(COLLECTION_PAPERS, q, {
+      $set: {
+        data: item
+      }
+    });
+  };
+  ctx.body = {};
+});
+
+async function handlePaper(data) {
+  let time = new Date().getTime();
+  data.post._id = Hash(data.post.title);
+  data.post.publish_time = time;
+  data.post.questions = await handleQ(data.post.questions);
+  return data;
+}
+
+async function handleQ(list) {
+  const _list = [];
+  for(let i = list.length-1; i >=0; i--) {
+    let item = list[i],
+         _id = Hash(JSON.stringify(item)),
+         q = { _id };
+    let res = await mongodb.update(COLLECTION_Q, q, {
+      $set: {
+        data: item
+      }
+    });
+    _list.unshift(_id);
+  };
+  return _list;
+}
+
 
 module.exports = r;

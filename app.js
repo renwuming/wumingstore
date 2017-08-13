@@ -11,7 +11,7 @@ app.use(bodyParser());
 
 const staticPath = './static';
 app.use(static(
-  path.join( __dirname,  staticPath)
+  path.join( __dirname, staticPath)
 ));
 
 router(app);
