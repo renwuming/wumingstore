@@ -137,7 +137,7 @@ async function handlePaperGet(list) {
 
 
 // 从json文件更新题库
-const FILE_PATH = path.join(__dirname, "../static/papers.json");
+const FILE_PATH = path.join(__dirname, "../files/papers.json");
 r.post("/papers", async ( ctx ) => {
   const _papers = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8'));
   for(let i = _papers.length-1; i >=0; i--) {
