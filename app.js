@@ -17,4 +17,5 @@ app.use(static(
 router(app);
 
 app.listen(port);
+console.info(`\n\r${new Date()}\n\r`);
 console.info('app start on port ', port);
