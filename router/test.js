@@ -113,15 +113,15 @@ r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
             has_more;
   const query = {
-    "data.post.publish_time": {
+    "data.publish_time": {
       $gt: _lastkey
     }
   };
-  let list = (await mongodb.find(COLLECTION_PAPERS, query));
+  let list = await mongodb.find(COLLECTION_PAPERS, query);
   has_more = list.length > PAPERS_LENGTH;
   if(list.length) {
     list = list.slice(0,PAPERS_LENGTH);
-    _lastkey = list[list.length-1].data.post.publish_time;
+    _lastkey = list[list.length-1].data.publish_time;
     await handlePaperGet(list);
   }
   ctx.body = {
@@ -134,16 +134,15 @@ r.get("/papers/:lastkey", async ( ctx ) => {
 async function handlePaperGet(list) {
   for(let i = list.length-1; i >=0; i--) {
     let item = list[i],
-         _ql = item.data.post.questions;
+         _ql = item.data.questions;
     for(let j = _ql.length-1; j >=0; j--) {
       let _id = _ql[j],
            q = { _id };
-      // let res = (await mongodb.find(COLLECTION_Q, q))[0];
       let res = await mongodb.findOne(COLLECTION_Q, q);
       _ql[j] = res;
     }
     list[i] = item.data;
-    list[i]._id = item.data.post._id;
+    list[i]._id = item.data._id;
   };
 }
 
@@ -154,7 +153,7 @@ r.post("/papers", async ( ctx ) => {
   const _papers = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8'));
   for(let i = _papers.length-1; i >=0; i--) {
     let item = await handlePaper(_papers[i]),
-         q = { _id: item.post._id };
+         q = { _id: item._id };
     let res = await mongodb.update(COLLECTION_PAPERS, q, {
       $set: {
         data: item
@@ -166,9 +165,9 @@ r.post("/papers", async ( ctx ) => {
 
 async function handlePaper(data) {
   let time = new Date().getTime();
-  data.post._id = Hash(data.post.title);
-  data.post.publish_time = time;
-  data.post.questions = await handleQ(data.post.questions);
+  data._id = Hash(data.title);
+  data.publish_time = time;
+  data.questions = await handleQ(data.questions);
   return data;
 }
 

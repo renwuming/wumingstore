@@ -1,37 +1,34 @@
 [
   {
+    "title": "你心知肚明哪些“我就看看”的攻略贴？",
+    "description": "一个处处是导师，收藏夹有点装不下的世界。（题图来自：Allison Kerek）",
+    "record_count": 280,
+    "comment_count": 7,
+    "praise_count": 0,
     "image": "http://testimg.qdaily.com/paper/paper_show/201607021838161fwg3sSZdalB09UR.jpg",
-    "post": {
-      "title": "你心知肚明哪些“我就看看”的攻略贴？",
-      "description": "一个处处是导师，收藏夹有点装不下的世界。（题图来自：Allison Kerek）",
-      "record_count": 280,
-      "comment_count": 7,
-      "praise_count": 0,
-      "image": "http://testimg.qdaily.com/paper/paper_show/201607021838161fwg3sSZdalB09UR.jpg",
-      "datatype": 0,
-      "questions": [
-        {
-          "title": "你心知肚明哪些“我就看看”的攻略贴？",
-          "options": [
-            {
-              "content": "DIY和韩剧女主角一样的妆容",
-              "score": 0
-            },
-            {
-              "content": "三个月练出人鱼线",
-              "score": 0
-            },
-            {
-              "content": "365天不重样的快手早餐",
-              "score": 0
-            },
-            {
-              "content": "只用3000元，提升出租屋的格调",
-              "score": 0
-            }
-          ]
-        }
-      ]
-    }
+    "datatype": 0,
+    "questions": [
+      {
+        "title": "你心知肚明哪些“我就看看”的攻略贴？",
+        "options": [
+          {
+            "content": "DIY和韩剧女主角一样的妆容",
+            "score": 0
+          },
+          {
+            "content": "三个月练出人鱼线",
+            "score": 0
+          },
+          {
+            "content": "365天不重样的快手早餐",
+            "score": 0
+          },
+          {
+            "content": "只用3000元，提升出租屋的格调",
+            "score": 0
+          }
+        ]
+      }
+    ]
   }
 ]
