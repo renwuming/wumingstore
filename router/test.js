@@ -140,6 +140,7 @@ async function handlePaperGet(list) {
       _ql[j] = res;
     }
     list[i] = item.data;
+    list[i]._id = item.data.post._id;
   };
 }
 
