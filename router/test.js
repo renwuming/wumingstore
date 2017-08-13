@@ -139,6 +139,7 @@ async function handlePaperGet(list) {
       let res = await mongodb.findOne(COLLECTION_Q, q);
       _ql[j] = res;
     }
+    list[i] = item.data;
   };
 }
 
