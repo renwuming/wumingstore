@@ -120,6 +120,7 @@ r.get("/papers/:lastkey", async ( ctx ) => {
   let list = (await mongodb.find(COLLECTION_PAPERS, query));
   has_more = list.length > PAPERS_LENGTH;
   list = list.slice(0,PAPERS_LENGTH);
+  _lastkey = list[list.length-1].data.post.publish_time;
   await handlePaperGet(list);
   ctx.body = {
     has_more,
