@@ -140,10 +140,10 @@ async function handlePaperGet(list) {
            q = { _id };
       let res = await mongodb.findOne(COLLECTION_Q, q);
       _ql[j] = res.data;
-      _ql[j].id = res.data._id;
+      _ql[j].id = res._id;
     }
     list[i] = item.data;
-    list[i].id = item.data._id;
+    list[i].id = item._id;
   };
 }
 
@@ -155,6 +155,7 @@ r.post("/papers", async ( ctx ) => {
   for(let i = _papers.length-1; i >=0; i--) {
     let item = await handlePaper(_papers[i]),
          q = { _id: item._id };
+    delete item._id;
     let res = await mongodb.update(COLLECTION_PAPERS, q, {
       $set: {
         data: item
