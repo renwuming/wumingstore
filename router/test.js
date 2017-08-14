@@ -139,10 +139,11 @@ async function handlePaperGet(list) {
       let _id = _ql[j],
            q = { _id };
       let res = await mongodb.findOne(COLLECTION_Q, q);
-      _ql[j] = res;
+      _ql[j] = res.data;
+      _ql[j].id = res.data._id;
     }
     list[i] = item.data;
-    list[i]._id = item.data._id;
+    list[i].id = item.data._id;
   };
 }
 
