@@ -7,6 +7,20 @@
     "praise_count": 0,
     "image": "http://www.renwuming.xyz/wumingstore/img/test.jpg",
     "datatype": 0,
+    "result": [
+      {
+        "score": 0.3,
+        "content": "你真是个清纯的boy！"
+      },
+      {
+        "score": 0.6,
+        "content": "污力涛涛说的就是你吧！"
+      },
+      {
+        "score": 0.9,
+        "content": "如果污是一种生产力，那么你可以供养太阳系！"
+      }
+    ],
     "questions": [
       {
         "title": "以下哪部影片中最可能含有h镜头？",
