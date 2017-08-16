@@ -211,7 +211,7 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
             answers = questions.map(e=> ({
               id: e.id,
               selected: e.selected
-            });
+            }));
 
   const data = {
     from: await middleware.getSessionBy(req.from),
