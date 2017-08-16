@@ -256,7 +256,6 @@ async function handleAnswersGet(list) {
   for(let i = list.length-1; i >=0; i--) {
     let item = list[i],
          answers = utils.deepAssign(item.answers),
-         questions = await getQList(item.answers),
          player = await getUserInfo(item.player),
          paper = await getPaper(item.id);
 
@@ -267,18 +266,17 @@ async function handleAnswersGet(list) {
     list[i] = {
       result: list[i]
     };
-    list[i].questions = questions;
     list[i].paper = paper;
   };
 }
 
 async function getQList(list) {
   for(let j = list.length-1; j >=0; j--) {
-    let { id, selected } = list[j],
-         q = { _id: id };
+    let _id = list[j],
+         q = { _id };
     let res = await mongodb.findOne(COLLECTION_Q, q);
     list[j] = res.data;
-    list[j].id = id;
+    list[j].id = _id;
   }
   return list;
 }
@@ -295,6 +293,7 @@ async function getPaper(_id) {
        paper = await mongodb.findOne(COLLECTION_PAPERS, q);
   paper = paper.data;
   paper.id = _id;
+  paper.questions = await getQList(paper.questions)
   return paper;
 }
 
