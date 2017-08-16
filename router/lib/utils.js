@@ -1,6 +1,6 @@
 const utils = {};
 
-utils.deepAssign = function(obj){
+deepAssign = function(obj){
   if(obj === undefined || obj === null) return obj;
   let __copy;
   if(obj instanceof Date) __copy = new Date(obj);
@@ -17,5 +17,6 @@ utils.deepAssign = function(obj){
   return __copy;
 };
 
+utils.deepAssign = deepAssign;
 
 module.exports = utils;
