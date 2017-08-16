@@ -259,10 +259,12 @@ async function handleAnswersGet(list) {
          player = await getUserInfo(item.player),
          paper = await getPaper(item.id);
 
-    delete list[i].from;
-    delete list[i]._id;
+    list[i].paperid = list[i].id;
+    list[i].id = list[i]._id;
     list[i].answers = answers;
     list[i].player = player;
+    delete list[i].from;
+    delete list[i]._id;
     list[i] = {
       result: list[i]
     };
