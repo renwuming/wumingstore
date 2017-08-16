@@ -1,11 +1,18 @@
 const client = require("mongodb").MongoClient;
 const DB_CONN_STR = "mongodb://localhost:27017/test";
 
+const options = {  
+    server: {
+        auto_reconnect: true,
+        poolSize: 10
+    }
+};
+
 let DB;
 
 const connect = function(conn_str) {
   return new Promise(function(resolve, reject) {
-    client.connect(conn_str, function(err, db) {
+    client.connect(conn_str, options, function(err, db) {
       console.log("mongodb connect success!");
       if(err) {
         reject(err);
