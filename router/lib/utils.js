@@ -1,4 +1,6 @@
-module.exports.deepAssign = function(obj){
+const utils = {};
+
+utils.deepAssign = function(obj){
   if(obj === undefined || obj === null) return obj;
   let __copy;
   if(obj instanceof Date) __copy = new Date(obj);
@@ -13,4 +15,7 @@ module.exports.deepAssign = function(obj){
     }
   }
   return __copy;
-}
+};
+
+
+module.exports = utils;
