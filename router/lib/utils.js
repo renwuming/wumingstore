@@ -9,7 +9,7 @@ deepAssign = function(obj){
     if(!obj.hasOwnProperty(key)) continue;
     let item = obj[key];
     if(item instanceof Object) {
-      __copy[key] = deepCopy(item);
+      __copy[key] = deepAssign(item);
     } else {
       __copy[key] = item;
     }
