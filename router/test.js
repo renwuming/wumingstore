@@ -208,7 +208,7 @@ async function handleQ(list) {
 r.post("/result", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body,
             { id, questions } = req,
-            answers = questions.map(e=> ({
+            questions = questions.map(e=> ({
               id: e.id,
               selected: e.selected
             }));
@@ -217,7 +217,7 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
     from: await middleware.getSessionBy(req.from),
     player: ctx.state.openid,
     id,
-    answers
+    questions
   };
   let res = await mongodb.insert(COLLECTION_ANSWERS, data);
 
