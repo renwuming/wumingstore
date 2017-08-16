@@ -207,11 +207,11 @@ async function handleQ(list) {
 // 提交测试结果
 r.post("/result", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body,
-            { id, questions } = req,
-            questions = questions.map(e=> ({
-              id: e.id,
-              selected: e.selected
-            }));
+            { id, questions } = req;
+  questions = questions.map(e=> ({
+    id: e.id,
+    selected: e.selected
+  }));
 
   const data = {
     from: await middleware.getSessionBy(req.from),
