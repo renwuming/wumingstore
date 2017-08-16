@@ -263,11 +263,11 @@ async function handleAnswersGet(list) {
     delete list[i].from;
     delete list[i]._id;
     list[i].answers = answers;
+    list[i].player = player;
     list[i] = {
       result: list[i]
     };
     list[i].questions = questions;
-    list[i].player = player;
     list[i].paper = paper;
   };
 }
