@@ -1,6 +1,6 @@
 node_modules/
-/static/
-/files/
 !/files/empty
 !/static/empty
+/static/
+/files/
 /router/lib/config.js
