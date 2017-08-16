@@ -255,15 +255,20 @@ r.get("/results/:lastkey", async ( ctx ) => {
 async function handleAnswersGet(list) {
   for(let i = list.length-1; i >=0; i--) {
     let item = list[i],
+         answers = utils.deepAssign(item.answers),
          questions = await getQList(item.answers),
          player = await getUserInfo(item.player),
          paper = await getPaper(item.id);
 
+    delete list[i].from;
+    delete list[i]._id;
+    list[i].answers = answers;
+    list[i] = {
+      result: list[i]
+    };
     list[i].questions = questions;
     list[i].player = player;
     list[i].paper = paper;
-    delete list[i].from;
-    delete list[i]._id;
   };
 }
 
