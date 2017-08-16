@@ -255,7 +255,7 @@ r.get("/results/:lastkey", async ( ctx ) => {
 async function handleAnswersGet(list) {
   for(let i = list.length-1; i >=0; i--) {
     let item = list[i],
-         questions = await getQList(item.questions),
+         questions = await getQList(item.answers),
          player = await getUserInfo(item.player),
          paper = await getPaper(item.id);
 
