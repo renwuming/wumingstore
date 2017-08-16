@@ -20,7 +20,7 @@ mid.getSession = function() {
 
 mid.getSessionBy = async function(sessionid) {
     let sk = await redis.getSync(sessionid);
-    sk = JSON.parse(sk);
+    sk = JSON.parse(sk) || {};
     return sk.openid;
 }
 

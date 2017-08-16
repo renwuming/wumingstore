@@ -32,6 +32,18 @@ async function getDB() {
   }
 }
 
+const insertSync = function(collection, objNew) {
+  return new Promise(function(resolve, reject) {
+    collection.insert(objNew, function(err, res) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
+  });
+}
+
 const updateSync = function(collection, criteria, objNew) {
   return new Promise(function(resolve, reject) {
     collection.update(criteria, objNew, {upsert: true, multi: true}, function(err, res) {
@@ -66,7 +78,18 @@ const findSync = function(collection, query, one) {
   });
 }
 
-async function update(collection, criteria, objNew, callback) {
+async function insert(collection, objNew) {
+  const db = await getDB();
+  const col = db.collection(collection);
+  try {
+    let res = await insertSync(col, objNew);
+    return res;
+  } catch(e) {
+    return e.toString();
+  }
+}
+
+async function update(collection, criteria, objNew) {
   const db = await getDB();
   const col = db.collection(collection);
   try {
@@ -92,6 +115,7 @@ async function findOne(collection, query) {
 }
 
 module.exports = {
+  insert,
   update,
   find,
   findOne

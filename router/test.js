@@ -10,6 +10,7 @@ const utils = require("./lib/utils.js");
 const COLLECTION = "test";
 const COLLECTION_PAPERS = "papers";
 const COLLECTION_Q = "questions";
+const COLLECTION_ANSWERS = "answers";
 
 r.post("/list", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
@@ -108,6 +109,20 @@ async function handleData(data) {
   }
 }
 
+// 根据id获取测试题
+r.get("/paper/:id", async ( ctx ) => {
+  let _id = ctx.params.id;
+  const query = { _id };
+  let list = [await mongodb.findOne(COLLECTION_PAPERS, query)];
+  if(list.length) {
+    await handlePaperGet(list);
+  }
+  ctx.body = {
+    feeds: list
+  };
+});
+
+// 根据时间戳获取测试题列表
 const PAPERS_LENGTH = 5;
 r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
@@ -148,7 +163,7 @@ async function handlePaperGet(list) {
 }
 
 
-// 从json文件更新题库
+// 从json文件更新测试题库
 const FILE_PATH = path.join(__dirname, "../files/papers.json");
 r.post("/papers", async ( ctx ) => {
   const _papers = JSON.parse(fs.readFileSync(FILE_PATH, 'utf8'));
@@ -189,5 +204,33 @@ async function handleQ(list) {
   return _list;
 }
 
+// 提交测试结果
+r.post("/result", middleware.getSession(), async ( ctx ) => {
+  const req = ctx.request.body;
+
+  const data = {
+    from: await middleware.getSessionBy(req.from),
+    player: ctx.state.openid,
+    detail: req.detail
+  };
+  console.log(data)
+  // const query = {
+  //   _id: ctx.state.openid
+  // };
+  // let list = (await mongodb.find(COLLECTION, query))[0];
+  // if(list && list.answerlist) {
+  //   list = list.answerlist;
+  // } else {
+  //   list = {};
+  // }
+  // if(list[req.key]) {
+  //   list[req.key].push(data);
+  // } else {
+  //   list[req.key] = [data];
+  // }
+  let res = await mongodb.insert(COLLECTION_ANSWERS, data);
+
+  ctx.body = {};
+});
 
 module.exports = r;
