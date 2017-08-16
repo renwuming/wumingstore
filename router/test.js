@@ -206,28 +206,19 @@ async function handleQ(list) {
 
 // 提交测试结果
 r.post("/result", middleware.getSession(), async ( ctx ) => {
-  const req = ctx.request.body;
+  const req = ctx.request.body,
+            { id, questions } = req,
+            answers = questions.map(e=> ({
+              id: e.id,
+              selected: e.selected
+            });
 
   const data = {
     from: await middleware.getSessionBy(req.from),
     player: ctx.state.openid,
-    detail: req.detail
+    id,
+    answers
   };
-  console.log(data)
-  // const query = {
-  //   _id: ctx.state.openid
-  // };
-  // let list = (await mongodb.find(COLLECTION, query))[0];
-  // if(list && list.answerlist) {
-  //   list = list.answerlist;
-  // } else {
-  //   list = {};
-  // }
-  // if(list[req.key]) {
-  //   list[req.key].push(data);
-  // } else {
-  //   list[req.key] = [data];
-  // }
   let res = await mongodb.insert(COLLECTION_ANSWERS, data);
 
   ctx.body = {};
