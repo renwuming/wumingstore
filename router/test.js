@@ -242,7 +242,7 @@ r.get("/results/:lastkey", async ( ctx ) => {
   has_more = list.length > DATA_LENGTH;
   if(list.length) {
     list = list.slice(0, DATA_LENGTH);
-    _lastkey = list[list.length-1].data.publish_time;
+    _lastkey = list[list.length-1].publish_time;
     await handleAnswersGet(list);
   }
   ctx.body = {
