@@ -8,9 +8,12 @@ const Hash = require("./lib/hash.js");
 const utils = require("./lib/utils.js");
 
 const COLLECTION = "test";
+const COLLECTION_USER = "user";
 const COLLECTION_PAPERS = "papers";
 const COLLECTION_Q = "questions";
 const COLLECTION_ANSWERS = "answers";
+
+const DATA_LENGTH = 5;
 
 r.post("/list", middleware.getSession(), async ( ctx ) => {
   const req = ctx.request.body;
@@ -123,7 +126,6 @@ r.get("/paper/:id", async ( ctx ) => {
 });
 
 // 根据时间戳获取测试题列表
-const PAPERS_LENGTH = 5;
 r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
             has_more;
@@ -133,9 +135,9 @@ r.get("/papers/:lastkey", async ( ctx ) => {
     }
   };
   let list = await mongodb.find(COLLECTION_PAPERS, query);
-  has_more = list.length > PAPERS_LENGTH;
+  has_more = list.length > DATA_LENGTH;
   if(list.length) {
-    list = list.slice(0,PAPERS_LENGTH);
+    list = list.slice(0, DATA_LENGTH);
     _lastkey = list[list.length-1].data.publish_time;
     await handlePaperGet(list);
   }
@@ -155,7 +157,7 @@ async function handlePaperGet(list) {
            q = { _id };
       let res = await mongodb.findOne(COLLECTION_Q, q);
       _ql[j] = res.data;
-      _ql[j].id = res._id;
+      _ql[j].id = _id;
     }
     list[i] = item.data;
     list[i].id = item._id;
@@ -208,7 +210,7 @@ async function handleQ(list) {
 r.post("/result", middleware.getSession(), async ( ctx ) => {
   let req = ctx.request.body,
             { id, questions } = req;
-  questions = questions.map(e=> ({
+  let answers = questions.map(e=> ({
     id: e.id,
     selected: e.selected
   }));
@@ -217,11 +219,80 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
     from: await middleware.getSessionBy(req.from),
     player: ctx.state.openid,
     id,
-    questions
+    answers,
+    publish_time: +new Date()
   };
   let res = await mongodb.insert(COLLECTION_ANSWERS, data);
 
   ctx.body = {};
 });
+
+
+
+// 根据时间戳获取测试结果列表
+r.get("/results/:lastkey", async ( ctx ) => {
+  let _lastkey = +ctx.params.lastkey,
+            has_more;
+  const query = {
+    publish_time: {
+      $gt: _lastkey
+    }
+  };
+  let list = await mongodb.find(COLLECTION_ANSWERS, query);
+  has_more = list.length > DATA_LENGTH;
+  if(list.length) {
+    list = list.slice(0, DATA_LENGTH);
+    _lastkey = list[list.length-1].data.publish_time;
+    await handleAnswersGet(list);
+  }
+  ctx.body = {
+    has_more,
+    last_key: _lastkey,
+    feeds: list
+  };
+});
+
+async function handleAnswersGet(list) {
+  for(let i = list.length-1; i >=0; i--) {
+    let item = list[i],
+         questions = await getQList(item.questions),
+         player = await getUserInfo(item.player),
+         paper = await getPaper(item.id);
+
+    list[i].questions = questions;
+    list[i].player = player;
+    list[i].paper = paper;
+    delete list[i].from;
+    delete list[i]._id;
+  };
+}
+
+async function getQList(list) {
+  for(let j = list.length-1; j >=0; j--) {
+    let { id, selected } = list[j],
+         q = { _id: id };
+    let res = await mongodb.findOne(COLLECTION_Q, q);
+    list[j] = res.data;
+    list[j].id = id;
+  }
+  return list;
+}
+
+async function getUserInfo(_id) {
+  let q = { _id },
+       info = await mongodb.findOne(COLLECTION_USER, q);
+  info && (info = info.userInfo);
+  return info;
+}
+
+async function getPaper(_id) {
+  let q = { _id },
+       paper = await mongodb.findOne(COLLECTION_PAPERS, q);
+  paper = paper.data;
+  paper.id = _id;
+  return paper;
+}
+
+
 
 module.exports = r;
