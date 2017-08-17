@@ -3,7 +3,7 @@ const redis = require("redis");
 const IP_ADDR = "localhost";
 const client = redis.createClient(6379, IP_ADDR);
 const DATABASE = "0";
-const EXPIRE_TIME = 10;
+const EXPIRE_TIME = 3600 * 24 * 31; // 有效期31天
 
 client.print = redis.print;
 
@@ -45,7 +45,7 @@ function setData(key, value) {
 
 client.setSync = async function(key, value) {
   await setData(key, value);
-  client.expire(key, EXPIRE_TIME); // 有效期一星期
+  client.expire(key, EXPIRE_TIME);
 }
 
 
