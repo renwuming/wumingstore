@@ -235,12 +235,13 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
 
 
 // 根据时间戳获取测试结果列表
-r.get("/results/:lastkey", async ( ctx ) => {
+r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
        has_more,
        query;
   if(_lastkey !== 0) {
     query = {
+      from: ctx.state.openid,
       publish_time: {
         $lt: _lastkey
       }
