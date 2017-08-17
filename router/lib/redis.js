@@ -3,7 +3,7 @@ const redis = require("redis");
 const IP_ADDR = "localhost";
 const client = redis.createClient(6379, IP_ADDR);
 const DATABASE = "0";
-const EXPIRE_TIME = 3600*24*7;
+const EXPIRE_TIME = 10;
 
 client.print = redis.print;
 
