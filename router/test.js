@@ -138,7 +138,7 @@ r.get("/papers/:lastkey", async ( ctx ) => {
     };
   }
 
-  let list = await mongodb.sort(COLLECTION_PAPERS, query, {publish_time: -1});
+  let list = await mongodb.sort(COLLECTION_PAPERS, query, {"data.publish_time": -1});
 
   has_more = list.length > DATA_LENGTH;
   if(list.length) {
