@@ -238,13 +238,12 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
 r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
        has_more,
-       query;
+       query = {
+         from: ctx.state.openid
+       };
   if(_lastkey !== 0) {
-    query = {
-      from: ctx.state.openid,
-      publish_time: {
-        $lt: _lastkey
-      }
+    query.publish_time = {
+      $lt: _lastkey
     };
   }
   let list = await mongodb.sort(COLLECTION_ANSWERS, query, {publish_time: -1});
