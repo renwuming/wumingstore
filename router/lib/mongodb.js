@@ -56,7 +56,7 @@ const updateSync = function(collection, criteria, objNew) {
   });
 }
 
-const findSync = function(collection, query, one) {
+const findSync = function(collection, query, one, sort) {
   return new Promise(function(resolve, reject) {
     if(one) {
       collection.findOne(query, function(err, res) {
@@ -67,7 +67,7 @@ const findSync = function(collection, query, one) {
         }
       });
     } else {
-      collection.find(query).toArray(function(err, res) {
+      collection.find(query).sort(sort).toArray(function(err, res) {
         if(err) {
           reject(err);
         } else {
@@ -114,9 +114,17 @@ async function findOne(collection, query) {
   return res;
 }
 
+async function sort(collection, query, sort) {
+  const db = await getDB();
+  const col = db.collection(collection);
+  let res = await findSync(col, query, false, sort);
+  return res;
+}
+
 module.exports = {
   insert,
   update,
   find,
+  sort,
   findOne
 }

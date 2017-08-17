@@ -128,13 +128,18 @@ r.get("/paper/:id", async ( ctx ) => {
 // 根据时间戳获取测试题列表
 r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
-            has_more;
-  const query = {
-    "data.publish_time": {
-      $gt: _lastkey
-    }
-  };
-  let list = await mongodb.find(COLLECTION_PAPERS, query);
+       has_more,
+       query;
+  if(_lastkey !== 0) {
+    query = {
+      "data.publish_time": {
+        $lt: _lastkey
+      }
+    };
+  }
+
+  let list = await mongodb.sort(COLLECTION_PAPERS, query, {publish_time: -1});
+
   has_more = list.length > DATA_LENGTH;
   if(list.length) {
     list = list.slice(0, DATA_LENGTH);
@@ -232,13 +237,17 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
 // 根据时间戳获取测试结果列表
 r.get("/results/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
-            has_more;
-  const query = {
-    publish_time: {
-      $gt: _lastkey
-    }
-  };
-  let list = await mongodb.find(COLLECTION_ANSWERS, query);
+       has_more,
+       query;
+  if(_lastkey !== 0) {
+    query = {
+      publish_time: {
+        $lt: _lastkey
+      }
+    };
+  }
+  let list = await mongodb.sort(COLLECTION_ANSWERS, query, {publish_time: -1});
+
   has_more = list.length > DATA_LENGTH;
   if(list.length) {
     list = list.slice(0, DATA_LENGTH);
