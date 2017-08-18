@@ -309,5 +309,15 @@ async function getPaper(_id) {
 }
 
 
+// 更新测试访问量
+r.post("/paper/record", async ( ctx ) => {
+  let _id = ctx.request.body.id;
+
+  let res = await mongodb.update(COLLECTION_PAPERS, {_id}, {
+    $inc: {"data.record_count": 1},
+  });
+
+  ctx.body = {};
+});
 
 module.exports = r;
