@@ -343,4 +343,16 @@ r.post("/paper/record", async ( ctx ) => {
   ctx.body = {};
 });
 
+
+// 更新测试结果是否已读
+r.post("/result/record", middleware.getSession(), async ( ctx ) => {
+  let _id = ctx.request.body.id;
+
+  let res = await mongodb.update(COLLECTION_ANSWERS, {_id}, {
+    $inc: {"record_count": 1},
+  });
+
+  ctx.body = {};
+});
+
 module.exports = r;
