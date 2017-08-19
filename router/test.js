@@ -240,45 +240,66 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
        has_more,
        query = {
          from: ctx.state.openid
-       };
+       },
+       list, papers = [];
+  list = await mongodb.find(COLLECTION_ANSWERS, query);
+  list = await handleAnswersGet(list);
   if(_lastkey !== 0) {
-    query.publish_time = {
-      $lt: _lastkey
-    };
+    list = list.filter(e => e.publish_time < _lastkey);
   }
-  let list = await mongodb.sort(COLLECTION_ANSWERS, query, {publish_time: -1});
-
   has_more = list.length > DATA_LENGTH;
   if(list.length) {
     list = list.slice(0, DATA_LENGTH);
     _lastkey = list[list.length-1].publish_time;
-    await handleAnswersGet(list);
+  }
+  // papers数据
+  for(let i = list.length-1; i >=0; i--) {
+    papers.push(await getPaper(list[i].id));
   }
   ctx.body = {
     has_more,
     last_key: _lastkey,
-    feeds: list
+    feeds: {
+      results: list,
+      papers
+    }
   };
 });
 
 async function handleAnswersGet(list) {
+  let hash = {},
+       results = [];
   for(let i = list.length-1; i >=0; i--) {
-    let item = list[i],
-         answers = utils.deepAssign(item.answers),
-         player = await getUserInfo(item.player),
-         paper = await getPaper(item.id);
-
-    list[i].paperid = list[i].id;
-    list[i].id = list[i]._id;
-    list[i].answers = answers;
-    list[i].player = player;
-    delete list[i].from;
-    delete list[i]._id;
-    list[i] = {
-      result: list[i]
-    };
-    list[i].paper = paper;
+    let e = list[i],
+         id = e.id;
+    e = await handleAnswerGet(e);
+    if(hash[id]) {
+      hash[id].list.push(e);
+      // 最新的publish_time
+      if(e.publish_time > hash[id].publish_time) hash[id].publish_time = e.publish_time;
+    } else {
+      hash[id] = {
+        id,
+        list: [e],
+        publish_time: e.publish_time
+      };
+    }
   };
+  for(let key in hash) {
+    results.push(hash[key]);
+  }
+  return results.sort((a,b) => b.publish_time - a.publish_time);
+}
+
+async function handleAnswerGet(item) {
+  let player = await getUserInfo(item.player);
+
+  item.paperid = item.id;
+  item.id = item._id;
+  item.player = player;
+  delete item.from;
+  delete item._id;
+  return item;
 }
 
 async function getQList(list) {
@@ -302,9 +323,11 @@ async function getUserInfo(_id) {
 async function getPaper(_id) {
   let q = { _id },
        paper = await mongodb.findOne(COLLECTION_PAPERS, q);
-  paper = paper.data;
-  paper.id = _id;
-  paper.questions = await getQList(paper.questions)
+  if(paper) {
+    paper = paper.data;
+    paper.id = _id;
+    paper.questions = await getQList(paper.questions);
+  }
   return paper;
 }
 
