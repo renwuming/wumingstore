@@ -1,7 +1,6 @@
+const config = require("./config");
 const redis = require("redis");
-// const IP_ADDR = "123.207.218.212";
-const IP_ADDR = "localhost";
-const client = redis.createClient(6379, IP_ADDR);
+const client = redis.createClient(config.REDIS_PORT, config.REDIS_IP, config.REDIS_OPTIONS);
 const DATABASE = "0";
 const EXPIRE_TIME = 3600 * 24 * 31; // 有效期31天
 
