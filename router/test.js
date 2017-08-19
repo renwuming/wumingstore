@@ -346,7 +346,7 @@ r.post("/paper/record", async ( ctx ) => {
 
 // 更新测试结果是否已读
 r.post("/result/record", middleware.getSession(), async ( ctx ) => {
-  let _id = ctx.request.body.id;
+  let _id = mongodb.ObjectId(ctx.request.body.id);
 
   let res = await mongodb.update(COLLECTION_ANSWERS, {_id}, {
     $inc: {"record_count": 1},
