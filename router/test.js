@@ -6,6 +6,7 @@ const mongodb = require("./lib/mongodb");
 const middleware = require("./middleware");
 const Hash = require("./lib/hash.js");
 const utils = require("./lib/utils.js");
+const config = require("./lib/config.js");
 
 const COLLECTION = "test";
 const COLLECTION_USER = "user";
@@ -345,7 +346,7 @@ r.post("/paper/record", async ( ctx ) => {
     $inc: {"data.record_count": 1},
   });
 
-  ctx.body = { tip: false };
+  ctx.body = { tip: config.SHOW_TIP };
 });
 
 
