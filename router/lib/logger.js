@@ -27,11 +27,11 @@ function log(ctx, time) {
   switch(method) {
     case "GET":
     case "DELETE":
-      getLogger().info('%s %s %s - %sms\r\nRequest: %s', method, status, url, time, str(query));
+      getLogger().info('%s %s %s - %sms\r\nRequest: %s\r\n\r\n', method, status, url, time, str(query));
       break;
     case "POST":
     case "PUT":
-      getLogger().info('%s %s %s - %sms\r\nRequest: %s\r\nResponse: %s', method, status, url, time, str(request), str(response));
+      getLogger().info('%s %s %s - %sms\r\nRequest: %s\r\nResponse: %s\r\n\r\n', method, status, url, time, str(request), str(response));
       break;
     default:
     break;
