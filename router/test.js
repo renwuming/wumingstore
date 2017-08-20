@@ -155,17 +155,22 @@ r.get("/papers/:lastkey", async ( ctx ) => {
 
 async function handlePaperGet(list) {
   for(let i = list.length-1; i >=0; i--) {
-    let item = list[i],
-         _ql = item.data.questions;
-    for(let j = _ql.length-1; j >=0; j--) {
-      let _id = _ql[j],
-           q = { _id };
-      let res = await mongodb.findOne(COLLECTION_Q, q);
-      _ql[j] = res.data;
-      _ql[j].id = _id;
+    try {
+      let item = list[i],
+           _ql = item.data.questions;
+      for(let j = _ql.length-1; j >=0; j--) {
+        let _id = _ql[j],
+             q = { _id };
+        let res = await mongodb.findOne(COLLECTION_Q, q);
+        _ql[j] = res.data;
+        _ql[j].id = _id;
+      }
+      list[i] = item.data;
+      list[i].id = item._id;
+    } catch(e) {
+      console.error(e);
+      continue;
     }
-    list[i] = item.data;
-    list[i].id = item._id;
   };
 }
 
