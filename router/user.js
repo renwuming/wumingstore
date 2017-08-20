@@ -6,10 +6,9 @@ const middleware = require("./middleware");
 const COLLECTION = "user";
 
 r.post("/userinfo", middleware.getSession(), async ( ctx ) => {
-  const req = ctx.request.body;
-  const updata = {
-    userInfo: req.userInfo
-  };
+  const userInfo = ctx.request.body.userInfo;
+  if(typeof userInfo === "string") userInfo = JSON.parse(userInfo);
+  let updata = { userInfo };
   res = await mongodb.update(COLLECTION, {
     _id: ctx.state.openid,
   }, {
