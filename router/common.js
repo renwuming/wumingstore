@@ -27,4 +27,14 @@ r.post("/sessionkey", async ( ctx ) => {
   }
 });
 
+
+r.post("/sessionid/validate", async ( ctx ) => {
+  const sessionid = ctx.request.body.sessionid,
+            openid = await middleware.getSessionBy(sessionid);
+
+  ctx.body = {
+    success: !!openid
+  };
+});
+
 module.exports = r;
