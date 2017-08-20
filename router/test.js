@@ -345,7 +345,7 @@ r.post("/paper/record", async ( ctx ) => {
     $inc: {"data.record_count": 1},
   });
 
-  ctx.body = {};
+  ctx.body = { tip: false };
 });
 
 
