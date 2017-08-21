@@ -248,6 +248,8 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
          from: ctx.state.openid
        },
        list, papers = [];
+  // MASTER_USER获取所有测试结果
+  if(config.MASTER_USER === from) delete query.from;
   list = await mongodb.find(COLLECTION_ANSWERS, query);
   list = await handleAnswersGet(list);
   if(_lastkey !== 0) {
