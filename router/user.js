@@ -17,4 +17,13 @@ r.post("/userinfo", middleware.getSession(), async ( ctx ) => {
   ctx.body = {};
 });
 
+r.get("/userinfo", middleware.getSession(), async ( ctx ) => {
+  const userInfo = await mongodb.findOne(COLLECTION, {
+    _id: ctx.state.openid,
+  });
+  ctx.body = {
+    userInfo
+  };
+});
+
 module.exports = r;

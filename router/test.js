@@ -8,110 +8,12 @@ const Hash = require("./lib/hash.js");
 const utils = require("./lib/utils.js");
 const config = require("./lib/config.js");
 
-const COLLECTION = "test";
 const COLLECTION_USER = "user";
 const COLLECTION_PAPERS = "papers";
 const COLLECTION_Q = "questions";
 const COLLECTION_ANSWERS = "answers";
 
 const DATA_LENGTH = 5;
-
-r.post("/list", middleware.getSession(), async ( ctx ) => {
-  const req = ctx.request.body;
-  const query = {
-    _id: ctx.state.openid
-  };
-  
-  const hash = Hash(req.item);
-  let list = (await mongodb.find(COLLECTION, query))[0];
-  list = list ? list.testlist : {};
-  list[hash] = req.item;
-
-  let res = await mongodb.update(COLLECTION, query, {
-    $set: {
-      testlist: list
-    }
-  });
-  ctx.body = {};
-});
-
-r.post("/getlist", middleware.getSession(), async ( ctx ) => {
-  const query = {
-    _id: ctx.state.openid
-  };
-  let list = (await mongodb.find(COLLECTION, query))[0];
-  list = list ? list.testlist : {};
-
-  ctx.body = list;
-});
-
-r.post("/getitem", middleware.getSession(), async ( ctx ) => {
-  const key = ctx.request.body.key;
-  const query = {
-    _id: ctx.state.openid
-  };
-  let list = (await mongodb.find(COLLECTION, query))[0];
-  list = list ? list.testlist : {};
-
-  ctx.body = list[key];
-});
-
-r.post("/commit", middleware.getSession(), async ( ctx ) => {
-  const req = ctx.request.body;
-
-  const data = {
-    player: await middleware.getSessionBy(req.player),
-    data: req.data
-  };
-  const query = {
-    _id: ctx.state.openid
-  };
-  let list = (await mongodb.find(COLLECTION, query))[0];
-  if(list && list.answerlist) {
-    list = list.answerlist;
-  } else {
-    list = {};
-  }
-  if(list[req.key]) {
-    list[req.key].push(data);
-  } else {
-    list[req.key] = [data];
-  }
-  let res = await mongodb.update(COLLECTION, query, {
-    $set: {
-      answerlist: list
-    }
-  });
-
-  ctx.body = {};
-});
-
-r.post("/getreslist", middleware.getSession(), async ( ctx ) => {
-  const req = ctx.request.body;
-  const query = {
-    _id: ctx.state.openid
-  };
-  let list = (await mongodb.find(COLLECTION, query))[0];
-  if(list && list.answerlist) {
-    list = list.answerlist;
-    await handleData(list);
-  } else {
-    list = {};
-  }
-  
-  ctx.body = list;
-});
-
-async function handleData(data) {
-  for(let key in data) {
-    for(let v of data[key]) {
-      let k = v.player;
-      let info = (await mongodb.find("user", {_id:k}))[0];
-      info && (info = info.userInfo);
-      v.player = info;
-    }
-  }
-}
 
 // 根据id获取测试题
 r.get("/paper/:id", async ( ctx ) => {
@@ -183,7 +85,7 @@ r.post("/papers", async ( ctx ) => {
   for(let i = _papers.length-1; i >=0; i--) {
     let item = await handlePaper(_papers[i]),
          q = { _id: item._id };
-    delete item._id;
+    Reflect.deleteProperty(item, "_id");
     let res = await mongodb.update(COLLECTION_PAPERS, q, {
       $set: {
         data: item
