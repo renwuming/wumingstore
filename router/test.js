@@ -151,7 +151,7 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
        },
        list, papers = [];
   // MASTER_USER获取所有测试结果
-  if(config.MASTER_USER === query.from) delete query.from;
+  if(config.MASTER_USER === query.from) Reflect.deleteProperty(query, "from");
   list = await mongodb.find(COLLECTION_ANSWERS, query);
   list = await handleAnswersGet(list);
   if(_lastkey !== 0) {
@@ -207,8 +207,8 @@ async function handleAnswerGet(item) {
   item.paperid = item.id;
   item.id = item._id;
   item.player = player;
-  delete item.from;
-  delete item._id;
+  Reflect.deleteProperty(item, "from");
+  Reflect.deleteProperty(item, "_id");
   return item;
 }
 

@@ -21,6 +21,7 @@ r.get("/userinfo", middleware.getSession(), async ( ctx ) => {
   const userInfo = await mongodb.findOne(COLLECTION, {
     _id: ctx.state.openid,
   });
+  userInfo && (userInfo = userInfo.userInfo);
   ctx.body = {
     userInfo
   };
