@@ -1,7 +1,12 @@
 const log4js = require('log4js');
 log4js.configure({
   appenders: {
-    logs: { type: 'file', filename: 'logs/wumingstore.log' },
+    logs: {
+      type: 'dateFile',
+      filename: 'logs/wumingstore',
+      pattern: '-yyyy-MM-dd.log',
+      alwaysIncludePattern: true,
+    },
     console: { type: 'console' }
   },
   categories: {
