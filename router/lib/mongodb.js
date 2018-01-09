@@ -2,7 +2,7 @@ const ObjectId = require('objectid');
 const client = require("mongodb").MongoClient;
 const DB_CONN_STR = "mongodb://localhost:27017/test";
 
-const options = {  
+const options = {
     server: {
         auto_reconnect: true,
         poolSize: 10
@@ -33,15 +33,27 @@ async function getDB() {
   }
 }
 
+// 支持insertMany
 const insertSync = function(collection, objNew) {
+  const arrayFlag = objNew instanceof Array;
   return new Promise(function(resolve, reject) {
-    collection.insert(objNew, function(err, res) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
+    if(arrayFlag) {
+      collection.insertMany(objNew, function(err, res) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    } else {
+      collection.insert(objNew, function(err, res) {
+        if(err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    }
   });
 }
 
@@ -77,6 +89,29 @@ const findSync = function(collection, query, one, sort) {
       });
     }
   });
+}
+
+const removeSync = function(collection, criteria) {
+  return new Promise(function(resolve, reject) {
+    collection.remove(criteria, function(err, res) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
+  });
+}
+
+async function remove(collection, criteria) {
+  const db = await getDB();
+  const col = db.collection(collection);
+  try {
+    let res = await removeSync(col, criteria);
+    return res;
+  } catch(e) {
+    return e.toString();
+  }
 }
 
 async function insert(collection, objNew) {
@@ -128,5 +163,6 @@ module.exports = {
   find,
   sort,
   findOne,
+  remove,
   ObjectId
 }
