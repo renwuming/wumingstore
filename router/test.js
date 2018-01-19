@@ -35,6 +35,7 @@ r.get("/papers/:lastkey", async ( ctx ) => {
        query;
   if(_lastkey !== 0) {
     query = {
+      datatype: 0,
       "data.publish_time": {
         $lt: _lastkey
       }
