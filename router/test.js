@@ -151,7 +151,7 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
        },
        list, papers = [];
   // MASTER_USER获取所有测试结果
-  if(config.MASTER_USER === query.from) Reflect.deleteProperty(query, "from");
+  if(config.MASTER_USERS.includes(query.from)) Reflect.deleteProperty(query, "from");
   list = await mongodb.find(COLLECTION_ANSWERS, query);
   list = await handleAnswersGet(list);
   if(_lastkey !== 0) {
