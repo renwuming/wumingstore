@@ -32,13 +32,12 @@ r.get("/paper/:id", async ( ctx ) => {
 r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
        has_more,
-       query;
+       query = {
+        ["data.datatype"]: 0,
+       };
   if(_lastkey !== 0) {
-    query = {
-      datatype: 0,
-      "data.publish_time": {
-        $lt: _lastkey
-      }
+    query["data.publish_time"] = {
+      $lt: _lastkey
     };
   }
 

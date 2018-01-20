@@ -138,7 +138,7 @@ async function handleAnswersGet(list) {
     } else {
       hash[level] = {
         level,
-        paperid: LEVEL_ID_LIST[level],
+        id: LEVEL_ID_LIST[level],
         list: [e],
         publish_time: e.publish_time
       };
@@ -153,12 +153,24 @@ async function handleAnswersGet(list) {
 async function handleAnswerGet(item) {
   let player = await getUserInfo(item.player);
 
-  item.level = item.level;
+  item.paperid = LEVEL_ID_LIST[item.level];
   item.id = item._id;
   item.player = player;
+  item.answers = handleObj2Arr(item.answers);
   Reflect.deleteProperty(item, "from");
   Reflect.deleteProperty(item, "_id");
   return item;
+}
+
+function handleObj2Arr(obj) {
+  let res = [];
+  for(let k in obj) {
+    res.push({
+      id: k,
+      selected: obj[k],
+    });
+  }
+  return res;
 }
 
 async function getUserInfo(_id) {
@@ -169,5 +181,15 @@ async function getUserInfo(_id) {
 }
 
 
+// 更新测试结果是否已读
+r.post("/friendtest/result/record", async ( ctx ) => {
+  let _id = mongodb.ObjectId(ctx.request.body.id);
+
+  let res = await mongodb.update(COLLECTION_FRIEND_ANSWERS, {_id}, {
+    $inc: {"record_count": 1},
+  });
+
+  ctx.body = {};
+});
 
 module.exports = r;
