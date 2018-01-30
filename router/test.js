@@ -12,6 +12,8 @@ const COLLECTION_USER = "user";
 const COLLECTION_PAPERS = "papers";
 const COLLECTION_Q = "questions";
 const COLLECTION_ANSWERS = "answers";
+const COLLECTION_FRIEND = "friendtest";
+const COLLECTION_FRIEND_ANSWERS = "friendtest_answers";
 
 const DATA_LENGTH = 5;
 
@@ -31,10 +33,11 @@ r.get("/paper/:id", async ( ctx ) => {
 // 根据时间戳获取测试题列表
 r.get("/papers/:lastkey", async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
-       has_more,
-       query = {
-        ["data.datatype"]: 0,
-       };
+      _datatype = +ctx.request.query.datatype || 0,
+      has_more,
+      query = {
+        ["data.datatype"]: _datatype,
+      };
   if(_lastkey !== 0) {
     query["data.publish_time"] = {
       $lt: _lastkey
@@ -49,12 +52,27 @@ r.get("/papers/:lastkey", async ( ctx ) => {
     _lastkey = list[list.length-1].data.publish_time;
     await handlePaperGet(list);
   }
-  ctx.body = {
+  let body = {
     has_more,
     last_key: _lastkey,
     feeds: list
   };
+  if(_datatype) {
+    let _id = await middleware.getSessionBy(ctx.request.query.sessionid);
+    let ansObj = await getFriendAnswer(_id);
+    body.answers = ansObj;
+  }
+  ctx.body = body;
 });
+
+async function getFriendAnswer(id) {
+  let query = { _id: id };
+  let ans = await mongodb.findOne(COLLECTION_FRIEND, query);
+  let res;
+  if(ans) res = ans.answers;
+  else res = {};
+  return res;
+}
 
 async function handlePaperGet(list) {
   for(let i = list.length-1; i >=0; i--) {
@@ -145,15 +163,21 @@ r.post("/result", middleware.getSession(), async ( ctx ) => {
 // 根据时间戳获取测试结果列表
 r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
   let _lastkey = +ctx.params.lastkey,
-       has_more,
-       query = {
-         from: ctx.state.openid
-       },
-       list, papers = [];
+      _datatype = +ctx.request.query.datatype || 0,
+      has_more,
+      query = {
+        from: ctx.state.openid
+      },
+      list, papers = [],
+      collectionHash = {
+        0: COLLECTION_ANSWERS,
+        1: COLLECTION_FRIEND_ANSWERS,
+      };
   // MASTER_USER获取所有测试结果
   if(config.MASTER_USERS.includes(query.from)) Reflect.deleteProperty(query, "from");
-  list = await mongodb.find(COLLECTION_ANSWERS, query);
-  list = await handleAnswersGet(list);
+
+  list = await mongodb.find(collectionHash[_datatype], query);
+  list = await handleAnswersGet(list, _datatype);
   if(_lastkey !== 0) {
     list = list.filter(e => e.publish_time < _lastkey);
   }
@@ -166,6 +190,7 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
   for(let i = list.length-1; i >=0; i--) {
     papers.push(await getPaper(list[i].id));
   }
+
   ctx.body = {
     has_more,
     last_key: _lastkey,
@@ -176,7 +201,7 @@ r.get("/results/:lastkey", middleware.getSession(), async ( ctx ) => {
   };
 });
 
-async function handleAnswersGet(list) {
+async function handleAnswersGet(list, datatype) {
   let hash = {},
        results = [];
   for(let i = list.length-1; i >=0; i--) {
@@ -191,7 +216,8 @@ async function handleAnswersGet(list) {
       hash[id] = {
         id,
         list: [e],
-        publish_time: e.publish_time
+        publish_time: e.publish_time,
+        datatype,
       };
     }
   };
