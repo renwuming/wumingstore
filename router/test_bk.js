@@ -125,6 +125,7 @@ r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
   let hash = {}, list = [];
   for(let item of rlist) {
     let player = item.player;
+    if(player == id) continue;
     if(!hash[player]) {
       hash[player] = await handleResult(item);
     }
