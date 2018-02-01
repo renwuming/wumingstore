@@ -103,11 +103,80 @@ r.get("/friendtest/paper", middleware.getSession(), async ( ctx ) => {
   let paper = await http.get(`http://localhost:9000/test/paper/${pid}`);
   if(paper) paper = paper.feeds[0];
   let answers = await getFriendAnswer(id);
+  let user = await getUserInfo(id);
 
   ctx.body = {
     paper,
     answers,
+    user,
   };
 });
+
+// 获取某个friendtest paper的近期答案列表
+r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
+  let pid = ctx.request.query.pid,
+      id = ctx.state.openid,
+      query = {
+        id: pid,
+        from: id,
+      };
+
+  let rlist = await mongodb.sort(COLLECTION_FRIEND_ANSWERS, query, {"publish_time": -1});
+  let hash = {}, list = [];
+  for(let item of rlist) {
+    let player = item.player;
+    if(!hash[player]) {
+      hash[player] = await handleResult(item);
+    }
+  }
+
+  for(let k in hash) {
+    list.push(hash[k]);
+    if(list.length>=5) break;
+  }
+
+  ctx.body = {
+    list,
+  };
+});
+
+async function handleResult(item) {
+  item.player = await getUserInfo(item.player);
+  let ansObj = await getFriendAnswer(item.from),
+      answers = item.answers,
+      len = 0,
+      l = 0;
+  for(let e of answers) {
+    let id = e.id,
+        ans = ansObj[id];
+    if(ans || ans == 0) len++;
+    if(ans == e.selected) l++;
+  }
+
+  let res = parseFloat(l / len * 100).toFixed(2);
+  if(isNaN(res)) res = 0;
+  item.score = res;
+
+  delete item._id;
+  delete item.from;
+  delete item.id;
+  return item;
+}
+
+async function getFriendAnswer(id) {
+  let query = { _id: id };
+  let ans = await mongodb.findOne(COLLECTION_FRIEND, query);
+  let res;
+  if(ans) res = ans.answers;
+  else res = {};
+  return res;
+}
+
+async function getUserInfo(_id) {
+  let q = { _id },
+      info = await mongodb.findOne(COLLECTION_USER, q);
+  info && (info = info.userInfo);
+  return info;
+}
 
 module.exports = r;
