@@ -97,13 +97,14 @@ r.post("/friendtest/result/record", async ( ctx ) => {
 
 // 获取某个friendtest paper
 r.get("/friendtest/paper", middleware.getSession(), async ( ctx ) => {
-  let pid = ctx.request.query.pid,
-      id = ctx.state.openid;
+  let { from, pid } = ctx.request.query,
+      id = ctx.state.openid,
+      fromId = await middleware.getSessionBy(from);
 
   let paper = await http.get(`http://localhost:9000/test/paper/${pid}`);
   if(paper) paper = paper.feeds[0];
   let answers = await getFriendAnswer(id);
-  let user = await getUserInfo(id);
+  let user = await getUserInfo(fromId);
 
   ctx.body = {
     paper,
