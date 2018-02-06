@@ -129,6 +129,7 @@ r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
     if(!hash[player]) {
       hash[player] = await handleResult(item);
     }
+    if(Object.keys(hash).length>=1) break;
   }
 
   for(let k in hash) {
