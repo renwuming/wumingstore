@@ -120,7 +120,7 @@ r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
       fromId = await middleware.getSessionBy(from),
       query = {
         id: pid,
-        from,
+        from: fromId,
       };
 
   let rlist = await mongodb.sort(COLLECTION_FRIEND_ANSWERS, query, {"publish_time": -1});
