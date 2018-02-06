@@ -103,7 +103,7 @@ r.get("/friendtest/paper", middleware.getSession(), async ( ctx ) => {
 
   let paper = await http.get(`http://localhost:9000/test/paper/${pid}`);
   if(paper) paper = paper.feeds[0];
-  let answers = await getFriendAnswer(id);
+  let answers = await getFriendAnswer(fromId);
   let user = await getUserInfo(fromId);
 
   ctx.body = {
@@ -115,11 +115,12 @@ r.get("/friendtest/paper", middleware.getSession(), async ( ctx ) => {
 
 // 获取某个friendtest paper的近期答案列表
 r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
-  let pid = ctx.request.query.pid,
+  let { pid, from } = ctx.request.query,
       id = ctx.state.openid,
+      fromId = await middleware.getSessionBy(from),
       query = {
         id: pid,
-        from: id,
+        from,
       };
 
   let rlist = await mongodb.sort(COLLECTION_FRIEND_ANSWERS, query, {"publish_time": -1});
