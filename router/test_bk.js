@@ -154,7 +154,7 @@ async function handleResult(item) {
     if(ans == e.selected) l++;
   }
 
-  let res = parseFloat(l / len * 100).toFixed(2);
+  let res = Math.floor(l / len * 100);
   if(isNaN(res)) res = 0;
   item.score = res;
 
