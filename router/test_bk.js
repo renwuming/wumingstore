@@ -136,7 +136,6 @@ r.get("/friendtest/result", middleware.getSession(), async ( ctx ) => {
 
   for(let k in hash) {
     list.push(hash[k]);
-    if(list.length>=5) break;
   }
 
   ctx.body = {
