@@ -11,7 +11,7 @@ const DEFAULT_INFO = {
   city: "",
   province: "",
   country: "",
-  avatarUrl: "https://www.renwuming.xyz/wumingstore/img/portrait.jpg",
+  avatarUrl: "https://sec-cdn.static.xiaomi.net/secStatic/groups/miui-sec/rentianfu/wxapp/common/portrait.jpg",
 };
 
 r.post("/userinfo", middleware.getSession(), async ( ctx ) => {
