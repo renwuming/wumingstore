@@ -38,6 +38,7 @@ r.post("/friendtest", middleware.getSession(), async ( ctx ) => {
     ctx.body = {
       errMsg: "Parameter error",
     };
+    return;
   }
   try {
     let obj = await getFriendAnswer(id);
