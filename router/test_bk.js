@@ -52,6 +52,24 @@ r.post("/friendtest", middleware.getSession(), async ( ctx ) => {
   }
 });
 
+// 获取我的答案
+r.get("/friendtest", middleware.getSession(), async ( ctx ) => {
+  let id = ctx.state.openid;
+  try {
+    let obj = await getFriendAnswer(id);
+
+    ctx.body = {
+      answers: obj
+    };
+  } catch(e) {
+    let error = e.toString();
+    console.log(error);
+    ctx.body = {
+      errMsg: error,
+    };
+  }
+});
+
 // 上传鉴定结果
 r.post("/friendtest/result", middleware.getSession(), async ( ctx ) => {
   let {pid, from, answers} = ctx.request.body,
