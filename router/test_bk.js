@@ -34,6 +34,11 @@ async function getFriendAnswer(id) {
 r.post("/friendtest", middleware.getSession(), async ( ctx ) => {
   let {qid, answer} = ctx.request.body,
       id = ctx.state.openid;
+  if(!qid||!answer) {
+    ctx.body = {
+      errMsg: "Parameter error",
+    };
+  }
   try {
     let obj = await getFriendAnswer(id);
     obj[qid] = answer;
