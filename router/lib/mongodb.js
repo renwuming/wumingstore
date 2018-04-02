@@ -164,5 +164,6 @@ module.exports = {
   sort,
   findOne,
   remove,
-  ObjectId
+  ObjectId,
+  getDB,
 }

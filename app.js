@@ -3,11 +3,13 @@ const router = require("./router");
 const bodyParser = require('koa-bodyparser');
 const _static = require('koa-static');
 const path = require("path");
+const cors = require("@koa/cors");
 const logger = require("./router/lib/logger");
 const port = process.env.PORT || 9000;
 
 const app = new koa();
 
+app.use(cors());
 app.use(bodyParser());
 
 const staticPath = './static';

@@ -2,6 +2,7 @@ const Router = require("koa-router");
 const r = new Router();
 const mongodb = require("./lib/mongodb");
 const middleware = require("./middleware");
+const getDB = mongodb.getDB;
 
 const COLLECTION = "user";
 const DEFAULT_INFO = {
@@ -41,6 +42,17 @@ r.get("/userinfo", middleware.getSession(), async ( ctx ) => {
   ctx.body = {
     userInfo
   };
+});
+
+
+r.get("/userList", async ( ctx ) => {
+  let db = await getDB(),
+      list = await db.collection(COLLECTION).find({}).toArray();
+  list = list.map(item => {
+    let {avatarUrl, city, gender, nickName} = item.userInfo;
+    return {avatarUrl, city, gender, nickName};
+  });
+  ctx.body = list;
 });
 
 module.exports = r;
