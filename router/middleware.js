@@ -1,4 +1,4 @@
-const cache = require("./lib/cache");
+const cache = require("./lib/cache")()
 const WXBizDataCrypt = require("./lib/WXBizDataCrypt");
 const config = require("./lib/config");
 const mid = {};
@@ -9,7 +9,7 @@ mid.getSession = function() {
               req2 = ctx.query,
               sessionid = req.sessionid || req2.sessionid;
 
-    let sk = await cache.get(sessionid);
+    let sk = cache.get(sessionid);
     if(sk) {
       ctx.state.sessionkey = sk.session_key;
       ctx.state.openid = sk.openid;
@@ -21,7 +21,7 @@ mid.getSession = function() {
 }
 
 mid.getSessionBy = async function(sessionid) {
-    let sk = await cache.get(sessionid);
+    let sk = cache.get(sessionid);
     sk = sk || {};
     return sk.openid;
 }
