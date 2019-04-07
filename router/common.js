@@ -4,7 +4,7 @@ const http = require("./lib/http");
 
 const config = require("./lib/config");
 const WXBizDataCrypt = require("./lib/WXBizDataCrypt");
-const redis = require("./lib/redis");
+const cache = require("./lib/cache")()
 const mongodb = require("./lib/mongodb");
 const middleware = require("./middleware");
 
@@ -22,7 +22,7 @@ r.post("/sessionkey", async ( ctx ) => {
     ctx.body = res;
   } else {
     const sessionid = WXBizDataCrypt.randomKey();
-    redis.setSync(sessionid, res);
+    cache.set(sessionid, res);
     ctx.body = sessionid;
   }
 });

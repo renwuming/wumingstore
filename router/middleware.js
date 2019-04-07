@@ -1,4 +1,4 @@
-const redis = require("./lib/redis");
+const cache = require("./lib/cache");
 const WXBizDataCrypt = require("./lib/WXBizDataCrypt");
 const config = require("./lib/config");
 const mid = {};
@@ -9,9 +9,8 @@ mid.getSession = function() {
               req2 = ctx.query,
               sessionid = req.sessionid || req2.sessionid;
 
-    let sk = await redis.getSync(sessionid);
+    let sk = await cache.get(sessionid);
     if(sk) {
-      sk = JSON.parse(sk);
       ctx.state.sessionkey = sk.session_key;
       ctx.state.openid = sk.openid;
       await next();
@@ -22,8 +21,8 @@ mid.getSession = function() {
 }
 
 mid.getSessionBy = async function(sessionid) {
-    let sk = await redis.getSync(sessionid);
-    sk = JSON.parse(sk) || {};
+    let sk = await cache.get(sessionid);
+    sk = sk || {};
     return sk.openid;
 }
 
